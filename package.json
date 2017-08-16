@@ -34,7 +34,7 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/thisancog/statistics.js.git"
-  }
+  },
   "directories": {
     "doc": "docs",
     "test": "tests"
