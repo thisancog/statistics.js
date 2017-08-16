@@ -23,13 +23,12 @@ Download the latest version of statistics.js and save it to a folder accessible 
 
 ##### Install from the command line #####
 
-Install from the command line with NPM, Yarn or Bower:
+Install from the command line with NPM or Yarn:
 
 
 ```
 $ npm install statistics.js
 $ yarn add statistics.js
-$ bower install statistics.js --save
 ```
 
 And then require the module in your project:
