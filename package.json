@@ -31,6 +31,10 @@
     "gulp-uglify": "^2.1.2",
     "jshint": "^2.9.4"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/thisancog/statistics.js.git"
+  }
   "directories": {
     "doc": "docs",
     "test": "tests"
