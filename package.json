@@ -1,0 +1,47 @@
+{
+  "name": "statistics.js",
+  "version": "1.0.0",
+  "author": "Matthias Planitzer (http://www.matthias-planitzer.de/)",
+  "description": "statistics.js allows to conduct common statistical analyses in any JavaScript environment.",
+  "main": "statistics.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "JavaScript",
+    "statistics"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-preset-babili": "0.0.12",
+    "babel-preset-es2015": "^6.24.0",
+    "babili": "0.0.12",
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-babili": "0.0.2",
+    "gulp-changed": "^2.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-imagemin": "^3.2.0",
+    "gulp-jshint": "^2.0.4",
+    "gulp-mocha": "^2.2.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^2.1.2",
+    "jshint": "^2.9.4"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thisancog/statistics.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thisancog/statistics.js/issues"
+  },
+  "homepage": "https://github.com/thisancog/statistics.js#readme"
+}

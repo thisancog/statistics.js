@@ -1,0 +1,2127 @@
+{
+	"general": {
+		"title": "statistics.js",
+		"version": "1.0",
+		"github": "https://github.com/thisancog/simplestatistics.js",
+		"download": "https://raw.githubusercontent.com/thisancog/simplestatistics.js/master/simplestatistics.min.js",
+		"creation": 2016,
+		"license": {
+			"name": "MIT License",
+			"url" : "https://opensource.org/licenses/MIT"
+		},
+		"footerText": "<p>statistics.js is a lightweight library to provide all basic and many advanced utilities commonly used in statistical data analysis. It is free to use, open source and open for contributions. If you find a bug or an error, please help making this tool better and file a report. That said, bugs can happen. For critical projects, use it with caution.</p><p>LaTeX rendering provided by <a href='https://www.mathjax.org' target='_blank' rel='noopener'>MathJax</a>, Syntax highlighting by <a href='http://prismjs.com/' target='_blank' rel='noopener'>Prism.js</a>, Icons by <a href='https://icomoon.io/app' target='_blank' rel='noopener'>Icomoon</a>.</p>"
+	},
+
+	"content": [
+	{
+		"section": "Introduction",
+		"file": "index.html",
+		"items": [
+			{
+				"title": "About",
+				"content": "statistics.js is a lightweight library to provide all basic and many advanced utilities commonly used in statistical data analysis. It is free to use, open source and open for contributions."
+			},
+			{
+				"title": "Download and installation",
+				"content": "<h5>Direct download for use in the browser</h5>Download the latest version of statistics.js and save it to a folder accessible to your project. Simply reference the file and you&rsquo;re good to go: <pre class='language-html'><code>&lt;script src=\"../path/to/statistics.min.js\" type=\"text/javascript\"&gt;&lt;/script&gt;</code></pre><h5>Install from the command line</h5><p>Install from the command line with NPM, Yarn or Bower:</p><pre class='language-command'><code>$ npm install statistics.js\n$ yarn add statistics.js\n$ bower install statistics.js --save</code></pre><p>And then require the module in your project:</p><pre class='lang-js'><code>var Statistics = require('/path/to/statistics.js');</code></pre>"
+			},
+			{
+				"title": "Getting started",
+				"content": "Initialise statistics.js as a new object, feeding it your data and &mdash; optionally but highly recommended &mdash; an object containing information about the data columns. There are also <a href='#settings'>a number of settings</a> available. You can then start calling methods as usual: <pre class='language-js'><code>var data = [\n\t{ ID: 1, age: 33 },\n\t{ ID: 2, age: 42 },\n\t{ ID: 3, age: 27 },\n\t&hellip;\n];\n\bvar columns = {\n\tID: 'ordinal',\n\tage: 'interval'\n\t&hellip;\n};\n\nvar settings = { &hellip; };\n\nvar stats = new Statistics(data, columns, settings);\n\nvar meanAge = stats.arithmeticMean(\"age\");\nvar stdDevAge = stats.standardDeviation(\"age\");</code></pre>",
+				"returns": "meanAge: 34\nstdDevAge: 7.54983&hellip;"
+			},
+			{
+				"title": "Entering data",
+				"content": "Data should be entered on initialisation in a well formatted way, i.e. as an array where each item is an object that stores information for each variable, e.g. <pre class='lang-js'><code>var data = [\n\t{ age: 32, agreement: 'none', iq: 104 },\n\t{ age: 45, agreement: 'somewhat', iq: 110 },\n\t&hellip;\n];</code></pre> Alternatively, data can be entered as a JSON encoded string that evaluates to the same structure. Later on, new datasets can be added with the <a href='inc/core.html#adddata'>addData()</a> and <a href='inc/core.html#addrow'>addRow()</a> methods. Any missing values will be filled in with <code class='lang-js'>NaN</code>. Along with the data, an object containing information about all variables, their scales of measurement and, optionally, their value maps should be specified. Possible scales of measure include \"<em>nominal</em>\", \"<em>ordinal</em>\", \"<em>interval</em>\" and \"<em>metric</em>\" (see <a href='#scalesofmeasure'>Scales of measure</a> for an explanation of the differences). Value maps are arrays of all the possible values of a (usually nordinal) variable and can be optionally defined to help properly labelling the values that are internally stored as integers. The order of the items within the value map should reflect the order of ordinal data from lowest to largest. <pre class='lang-js'><code>var columns = {\n\tage: 'metric',\n\tagreement: {\n\t\tscale: 'ordinal',\n\t\tvalueMap: ['none', 'somewhat', 'undecided', 'much', 'total']\n\t},\n\tiq: 'metric'\n};\n\nvar stats = new Statistics(data, columns);</code></pre>The definition <code class='lang-js'>someVariable: <em>someScale</em></code> is equivalent to <code class='lang-js'>someVariable: { scale: <em>someScale</em> }</code>."
+			},
+			{
+				"title": "Scales of measure",
+				"resources": ["https://en.wikipedia.org/wiki/Level_of_measurement"],
+				"content": "Statistical variables are usually distinguished by there scale of measure. A scale of measure describes the nature of the data assigned to a variable and thus permits (and forbids) how the variable can be manipulated and treated by statistical methods. It is highly encouraged to declare the scale of measure for each variable, as statistics.js will prevent any methods that are not valid for a given variable based on its scale of measurement. (<a href='#enteringdata'>see above</a> on how to define a variable&rsquo;s scale of measure)<br><br>According to Stanley Smith Stevens&rsquo; typology, scales of measure can be ordered by their level of sophisticiation where a given scale inherits all the valid methods from its precursor and adds new features:<ol><li><b>nominal scale</b>: This scale allows for classification only. The possible values are all distinct and mutually exclusive, can not be ordered or quantified. Therefore, values allow only for equality, not for comparison, can not be summed, substracted, multiplied or divided. The <a href='inc/measures.html#median'>mode</a> &ndash; the most common value &ndash; can be computed. A nominal variable that has only two values is also called dichotomous. Examples: gender, nationality, genre.</li><li><b>ordinal scale</b>: This scale introduces order in the form of ranks but does not account for the amount of difference between two given values. Values can be compared and sorted, but not summed, substracted, multiplied or divided. The <a href='inc/measures.html#median'>median</a> &ndash; the middle rank &ndash; can be computed. Some dichotomous variables can be on the ordinal scale if there is a sense of order, such as \"<em>guilty</em>\"/ \"<em>not guilty</em>\". Non-dichotomous examples include the Likert scale for measuring the level of agreement (\"<em>disagree</em>\", \"<em>somewhat disagree</em>\", \"<em>neutral</em>\", \"<em>somewhat agree</em>\", \"<em>agree</em>\") or school grades (where technically the difference between two values is not defined but often the <a href='inc/measures.html#arithmeticmean'>arithmetic mean</a> is calculated anyway).</li><li><b>interval scale</b>: This scale extends the ordinal scale by defining the amount of difference between two given values, e.g. the base metric upon which the space of all valid values is constructed. It introduces addition and subtraction, but does not allow for multiplication nor division as it lacks a meaningful, natural zero. For example, on the Celsius temperature scale, it is not meaningful to say that 30&deg;C is twice as hot as 15&deg;C. On the interval scale, the <a href='inc/measures.html#arithmeticmean'>arithmetic mean</a> and the <a href='inc/measures.html#standarddeviation'>standard deviation</a> can be determined. Examples: temperature on the Celsius scale (0&deg;C is an arbitrary zero, whereas 0&deg;K is a natural zero), percentage, location in space.</li><li><b>metric scale</b>: This scale extends the interval scale by defining a meaningful zero and therefore permits multiplication and division. The <a href='inc/measures.html#geometricmean'>geometric</a> and the <a href='inc/measures.html#harmonicmean'>harmonic mean</a> are introduced on this scale. Examples: mass, length, concentration of a chemical compound.</li></ol>"
+			},
+			{
+				"title": "Settings",
+				"content": "There are several settings you can adjust in order to change the behaviour of the library. You can pass one or several of them as an object upon initialisation. <ul><li><code class='language-js'>epsilon</code> (<em>default</em>: <code class='language-js'>0.00001</code>): The calculation of some statistical methods would progress forever, however for computational means a stopping variable epsilon is introduced. It&rsquo;s value is used as the boundary until where a iterative method will be executed. Generally, smaller values give more precision and result in longer computation times.</li><li><code class='language-js'>excludeColumns</code> (<em>default</em>: <code class='language-js'>[\"ID\", \"id\"]</code>): Accepts an array of strings that are names of the columns to ignore when assigning a scale of measure.</li><li><code class='language-js'>incompleteBetaIterations</code> (<em>default</em>: <code class='language-js'>40</code>): Accepts the number of iterations the method for the computation of the <a href='inc/algebra.html#incompletebeta'>incomplete beta function</a> will go through. Larger numbers give more precision.</li><li><code class='language-js'>incompleteGammaIterations</code> (<em>default</em>: <code class='language-js'>80</code>): Accepts the number of iterations the method for the computation of the <a href='inc/algebra.html#incompletegamma'>incomplete gamma function</a> will go through. Larger numbers give more precision.</li><li><code class='language-js'>maxBarnardsN</code> (<em>default</em>: <code class='language-js'>200</code>): Defines the maximum number of datasets that <a href='inc/tests.html#barnardstest'>Barnard&rsquo;s test</a> will accept due to performance. Change with caution.</li><li><code class='language-js'>spougeConstant</code> (<em>default</em>: <code class='language-js'>40</code>): Defines the constant <code class='language-js'>a</code> in Spouge&rsquo;s approximation of the <a href='inc/algebra.html#gamma'>gamma function</a>.</li><li><code class='language-js'>suppressWarnings</code> (<em>default</em>: <code class='language-js'>false</code>): Set this to <code class='language-js'>true</code> to prevent all warnings from being sent to the console.</li><li><code class='language-js'>zTableIterations</code> (<em>default</em>: <code class='language-js'>25</code>): Some statistical tests like the <a href='inc/tests.html#mannwhitneyu'>Mann-Whitney-U test</a> require a z table to look up probabilities of the <a href='inc/distributions.html#normalcumulativedistribution'>cumulative distribution function of the normal distribution</a>. This table will be automatically computed when needed, with as many iterations as defined here. The default value should be suitable for most cases, however, you may find a lower value for shorter computation times or a higher value for additional accuracy helpful.</li></ul>",
+				"usage": "var settings = {\n\texcludeColumns: [\"ID\", \"patientNumber\"],\n\tsuppressWarnings: true,\n\tzTableIterations: 15\n};\nvar stats = new Statistics(data, columns, settings);"
+			},
+			{
+				"title": "License",
+				"content": "statistics.js is open source and free to use, protected by the <a href='https://opensource.org/licenses/MIT' target='_blank' rel='noopener'>MIT License</a>:<br><br>Copyright 2016 &ndash; 2017 Matthias Planitzer and all contributors<br><br>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:<br><br>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<br><br>THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+			},
+			{
+				"title": "Contribute",
+				"content": "statistics.js is open source and open for contributions. If you&rsquo;re a programmer or a statistician, feel free to take part in this project! This library is hosted and maintained in a Github repository, where you can find the source code and commit to the project. Since I don&rsquo;t hold a degree in statistics, biometrics or anything similar, professional input is much appreciated. Also, if you find a bug, please report it on Github as well."
+			}
+		]
+	},
+	{
+		"section": "Core methods",
+		"file": "core.html",
+		"items": [
+			{
+				"title": "addData()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "dataset",
+						"types": ["array", "JSON encoded string"],
+						"required": true
+					}
+				],
+				"content": "Adds several rows of new data to the existing data to work with. All the elements of <code class='lang-js'>data</code> or, if <code class='lang-js'>data</code> is a JSON encoded string the array it evaluates to, need to have the same columns as the rest of the already existing data. Returns <code class='lang-js'>true</code> on success.",
+				"usage": "stats.addData([{age: 22, gender: \"male\", \"heartFrequency\": 89}, {age: 37, gender: \"female\", \"heartFrequency\": 76}]);",
+				"returns": true
+			},
+			{
+				"title": "addRow()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "dataset",
+						"types": ["object"],
+						"required": true
+					}
+				],
+				"content": "Adds a new row to the data to work with. <code class='lang-js'>dataset</code> needs to have the same columns as the rest of the data. Returns <code class='lang-js'>true</code> on success.",
+				"usage": "stats.addRow({age: 22,  gender: \"male\", \"heartFrequency\": 89});",
+				"returns": true
+			},
+			{
+				"title": "assignRanks()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Ranking#Ranking_in_statistics"],
+				"parameters": [
+					{
+						"name": "column",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"options": [
+							{
+								"name": "data",
+								"types": ["array"],
+								"default": "initialised data"
+							},
+							{
+								"name": "order",
+								"types": ["string"],
+								"default": "\"asc\""
+							},
+							{
+								"name": "handleTiedValues",
+								"types": ["string"],
+								"default": "\"mean\""
+							},
+							{
+								"name": "returnFrequencies",
+								"types": ["boolean"],
+								"default": false
+							}
+						]
+					}
+				],
+				"content": "Ranks the values of a column <code class='lang-js'>column</code> of a dataset <code class='lang-js'>data</code> in ascending (default) or descending order (set <code class='lang-js'>order</code> to <code class='lang-js'>'desc'</code>). Tied values (i.e. values that occur more than once) can be treated in two different ways: computing the mean of their ranks (default) or assign their ranks randomly (<code class='lang-js'>handleTiedValues = 'random'</code>). This method returns an array of objects each containing the original data and a new property <code class='lang-js'>rank-xyz</code> where <code class='lang-js'>xyz</code> is the name of the column that was ranked. Set <code class='lang-js'>returnFrequencies</code> to <code class='lang-js'>true</code> to return an object instead, storing the array as the <code class='lang-js'>data</code> property and an object of the values and their respective frequency as the <code class='lang-js'>frequencies</code> property.",
+				"usage": "var testData = [\n\t{ age: 22, iq: 110 },\n\t{ age: 26, iq: 107 },\n\t{ age: 43, iq: 85 },\n\t{ age: 37, iq: 99 },\n\t{ age: 26, iq: 104 },\n\t{ age: 22, iq: 103 },\n\t{ age: 29, iq: 106 },\n\t{ age: 26, iq: 102 },\n\t{ age: 35, iq: 102 },\n\t{ age: 38, iq: 96 }\n];\n\nvar testVars = {\n\tiq: 'metric',\n\tage: 'metric'\n};\n\nvar stats = new Statistics(testData, testVars);\nvar assignRanks = stats.assignRanks('age', { returnFrequencies: true, order: 'desc' } );",
+				"returns": "{\n\tdata: [\n\t\t{ age: 43, iq: 85, rank-age: 1 },\n\t\t{ age: 38, iq: 96, rank-age: 2 },\n\t\t{ age: 37, iq: 99, rank-age: 3 },\n\t\t{ age: 35, iq: 102, rank-age: 4 },\n\t\t{ age: 29, iq: 106, rank-age: 5 },\n\t\t{ age: 26, iq: 102, rank-age: 7 },\n\t\t{ age: 26, iq: 104, rank-age: 7 },\n\t\t{ age: 26, iq: 107, rank-age: 7 },\n\t\t{ age: 22, iq: 103, rank-age: 9.5 },\n\t\t{ age: 22, iq: 110, rank-age: 9.5 }\n\t],\n\tfrequencies: {\n\t\t22: 2,\n\t\t26: 3,\n\t\t29: 1,\n\t\t35: 1,\n\t\t37: 1,\n\t\t38: 1,\n\t\t43: 1\n\t}\n}"
+			},
+			{
+				"title": "contingencyTable()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Contingency_table"],
+				"parameters": [
+					{
+						"name": "firstColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "secondColumn",
+						"types": ["string"],
+						"required": true
+					}
+				],
+				"content": "Creates a contingency table of the stored data for two nominal or ordinal variables given by <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code> and returns a nested object with the individual counts for each pairing, total counts, and in case of only two unique values for each variable the individual fields represented as <code class='lang-js'>a, b, c, d</code>.",
+				"usage": "var testData = [\n\t{ gender: 'male', agreement: 'no' },\n\t{ gender: 'male', agreement: 'no' },\n\t{ gender: 'male', agreement: 'no' },\n\t{ gender: 'male', agreement: 'no' },\n\t{ gender: 'male', agreement: 'yes' },\n\t{ gender: 'male', agreement: 'yes' },\n\t{ gender: 'male', agreement: 'yes' },\n\t{ gender: 'female', agreement: 'no' },\n\t{ gender: 'female', agreement: 'yes' },\n\t{ gender: 'female', agreement: 'yes' },\n\t{ gender: 'female', agreement: 'yes' },\n\t{ gender: 'female', agreement: 'yes' }\n];\n\nvar testVars = { gender: 'nominal', agreement: 'nominal' };\nvar stats = new Statistics(testData, testVars);\nvar contingencyTable = stats.contingencyTable('gender', 'agreement');",
+				"returns": "{\n\tdetailled: {\n\t\tfemale: {\n\t\t\tno: 1,\n\t\t\tyes: 2,\n\t\t\ttotal: 3\n\t\t},\n\t\tmale: {\n\t\t\tno: 4,\n\t\t\tyes: 3,\n\t\t\ttotal: 7\n\t\t},\n\t\ttotal: {\n\t\t\tfemale: 3,\n\t\t\tmale: 7,\n\t\t\tno: 5,\n\t\t\tyes: 5,\n\t\t\ttotal: 10\n\t\t}\n\t},\n\ta: 4,\n\tb: 3,\n\tc: 1,\n\td: 2\n}"
+			},
+			{
+				"title": "getColumn()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "column",
+						"types": ["string"],
+						"required": true
+					}
+				],
+				"content": "Returns the values of the column <code class='lang-js'>dataset</code> in an array.",
+				"usage": "var ageColumn = stats.getColumn('age');",
+				"returns": "[ 22, 34, 27, 19, 27, 24, 37, 42, 45, 37 ]"
+			},
+			{
+				"title": "getScale()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "column",
+						"types": ["string"],
+						"required": true
+					}
+				],
+				"content": "Retrieves the scale of measurement for a column <code class='lang-js'>column</code>. See also <a href='../index.html#scalesofmeasure'>the explanation of the different scales</a>.",
+				"usage": "var scale = stats.getScale(\"age\");",
+				"returns": "\"interval\""
+			},
+			{
+				"title": "getUniqueValues()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"content": "Retrieves an ordered array of the unique values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values.",
+				"usage": "var uniques = stats.getUniqueValues([13, 4, 9, 7, 4, 5, 6, 13, 7, 5, 2, 1, 1, 3]);",
+				"returns": "[1, 2, 3, 4, 5, 6, 7, 9, 13]"
+			},
+			{
+				"title": "isNumeric()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "n",
+						"required": true
+					}
+				],
+				"content": "A simple test to determine if a variable <code class='lang-js'>n</code> is numeric, e.g. an integer, a floating point number or a number string. Returns <code class='lang-js'>undefined</code> if no variable was supplied.",
+				"usage": "var testInt = stats.isNumeric(12),\n\ttestFloat = stats.isNumeric(0.3),\n\ttestString = stats.isNumeric(\"4\"),\n\n\ttestInfinity = stats.isNumeric(Infinity),\n\ttestNaN = stats.isNumeric(NaN)\n\ttestObject = stats.isNumeric({a: 9}),\n\ttestArray1 = stats.isNumeric([6]),\n\ttestArray2 = stats.isNumeric([6, \"a\"]);",
+				"returns": "testInt: true\ntestFloat: true\ntestString: true\n\ntestInfinity: false\ntestNaN: false\ntestObject: false\ntestArray1: false\ntestArray2: false"
+			},
+			{
+				"title": "reduceToPairs()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "firstColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "secondColumn",
+						"types": ["string"],
+						"required": true
+					}
+				],
+				"content": "Returns the values of those datasets that have valid data for both <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code> along with their total count and the number of datasets with missing values.",
+				"usage": "var reduced = stats.reduceToPairs('age', 'gender');",
+				"returns": "{\n\tlength: 18,\n\tmissings: 2,\n\tvaluesFirst: [ 27, 24, &hellip; ],\n\tvaluesSecond: [ 'male', 'male', &hellip; ],\n\tvaluesCombined: [\n\t\t{\n\t\t\tage: 22,\n\t\t\tgender: 'male'\n\t\t},\n\t\t{\n\t\t\tage: 24,\n\t\t\tgender: 'male'\n\t\t},\n\t\t&hellip;\n\t]\n}"
+			},
+			{
+				"title": "removeRow()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "index",
+						"types": ["integer"],
+						"required": true
+					},
+					{
+						"name": "id",
+						"types": ["boolean"],
+						"required": false,
+						"default": false
+					}
+				],
+				"content": "Removes the row with <code class='lang-js'>index</code> from the data. Keep in mind that arrays start at index 0, so the n<sup>th</sup> element is actually at the index n-1. If <code class='lang-js'>id</code> is set to <code class='lang-js'>true</code>, the first row that has the column <code class='lang-js'>id</code> or <code class='lang-js'>ID</code> set to <code class='lang-js'>index</code> will be removed.",
+				"usage": "stats.removeRow(12);",
+				"returns": true
+			},
+			{
+				"title": "reset()",
+				"lastUpdated": "1.0",
+				"content": "Deletes all the data previously loaded, but keeps information about the scales of measure for each column, value maps, settings and all stored calculations (e.g. larger factorials, the z-table). Returns true on success.",
+				"usage": "stats.reset();",
+				"returns": true
+			},
+			{
+				"title": "scatterPlot()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["array"],
+						"required": false,
+						"default": "stored data"
+					},
+					{
+						"options": [
+							{
+								"name": "canvas",
+								"types": ["canvas node"],
+								"default": "create new one"
+							},
+							{
+								"name": "xAxis",
+								"types": ["integer"]
+							},
+							{
+								"name": "yAxis",
+								"types": ["integer"]
+							},
+							{
+								"name": "height",
+								"types": ["integer"],
+								"default": "automatically sized"
+							},
+							{
+								"name": "width",
+								"types": ["integer"],
+								"default": "automatically sized"
+							},
+							{
+								"name": "dotRadius",
+								"types": ["integer", "float"],
+								"default": 4
+							},
+							{
+								"name": "showGrid",
+								"types": ["boolean"],
+								"default": false
+							},
+							{
+								"name": "minNumberXMarks",
+								"types": ["integer"],
+								"default": 8
+							},
+							{
+								"name": "minNumberYMarks",
+								"types": ["integer"],
+								"default": 8
+							},
+							{
+								"name": "background",
+								"types": ["string"],
+								"default": "#FFFFFF"
+							},
+							{
+								"name": "color",
+								"types": ["string"],
+								"default": "#000000"
+							},
+							{
+								"name": "gridColor",
+								"types": ["string"],
+								"default": "#CCCCCC"
+							},
+							{
+								"name": "axisColor",
+								"types": ["string"],
+								"default": "#000000"
+							}
+						]
+					}
+				],
+				"content": "This method provides an interface to create simple scatter plots of given <code class='lang-js'>data</code>. It is intended to get a quick visual overview of data and thus is far from the precision and sophisticiation of dedicated plotting libraries such as <a href='https://d3js.org/' target='_blank' rel='noopener'>D3.js</a> or <a href='https://plot.ly/' target='_blank' rel='noopener'>plotly.js</a>. Be aware, that for some edge cases it may behave erroneously (in that case please file a bug report).<br/><br/>The parameters and options explained:<ul><li><em>data</em>: contains the data to be plotted either as an array of objects or an array of values. In the first case, any item without the properties <code class='lang-js'>xAxis</code> or <code class='lang-js'>yAxis</code> will be ignored as in both cases non-numerical values will be ignored as well. If an array of numeric values is supplied, the method will count the number of occurences for each unique value and plot them. If you want to plot each value to its index, rather supply an object.</li><li><em>canvas</em>: reference to a HTML5 canvas node in which the plot should be drawn, otherwise a new one will be created but not inserted into the DOM</li><li><em>xAxis</em>: if <code class='lang-js'>data</code> stores objects, then this will signify the name of the property to plot on the x axis</li><li><em>xAxis</em>: if <code class='lang-js'>data</code> stores objects, then this will signify the name of the property to plot on the y axis</li><li><em>height</em>: the height of the canvas. If omitted, it will be automatically sized. Minimum is <code class='lang-js'>400</code> px.</li><li><em>width</em>: the width of the canvas. If omitted, it will be automatically sized. Minimum is <code class='lang-js'>400</code> px.</li><li><em>dotRadius</em>: the data points&rsquo; radius</li><li><em>showGrid</em>: determines if a grid should extend from the axes markers</li><li><em>minNumberXMarks</em>: the minimum amount of marks on the x axis (currently a bit wonky, but usuable)</li><li><em>minNumberYMarks</em>: the minimum amount of marks on the y axis (currently a bit wonky, but usuable)</li><li><em>background</em>: the background color in the form of any valid <a href='https://www.w3schools.com/cssref/css_colors_legal.asp' target='_blank' rel='noopener'>CSS color string</a> (including &quot;transparent&quot;)</li><li><em>dotColor</em>: the color for the data points in the form of any valid <a href='https://www.w3schools.com/cssref/css_colors_legal.asp' target='_blank' rel='noopener'>CSS color string</a> (including &quot;transparent&quot;)</li><li><em>gridColor</em>: the grid color in the form of any valid <a href='https://www.w3schools.com/cssref/css_colors_legal.asp' target='_blank' rel='noopener'>CSS color string</a> (including &quot;transparent&quot;)</li><li><em>axisColor</em>: the axis color in the form of any valid <a href='https://www.w3schools.com/cssref/css_colors_legal.asp' target='_blank' rel='noopener'>CSS color string</a> (including &quot;transparent&quot;)</li></ul>An example plot for the values of the <a href='distributions.html#binomialdistribution'>binomial distribution</a> with <span class='latex-formula' data-formula='$$n = 20$$'></span> and <span class='latex-formula' data-formula='$$p = 0.2$$'></span> (calculated for k until the cumulative probability reaches epsilon) is shown in the example below.",
+				"usage": "var binomials = [\n\t{ k: 0, value: 0.01153 },\n\t{ k: 1, value: 0.05765 },\n\t{ k: 2, value: 0.13691 },\n\t{ k: 3, value: 0.20536 },\n\t&hellip;\n];\n\nvar options = {\n\txAxis: 'k',\n\tyAxis: 'value',\n\twidth: 600,\n\theight: 600,\n\tdotColor: '#EE2211'\n};\n\nvar plottedCanvas = stats.scatterPlot(binomials, options);\n\tdocument.body.appendChild(plottedCanvas);",
+				"returns": "<img src='plot.png' width='300' height='300' alt='An example scatter plot for the binomial distribution with n = 20 and p = 0.2'>"
+			},
+			{
+				"title": "setScale()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "column",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "scale",
+						"types": ["string"],
+						"required": true
+					}
+				],
+				"content": "Set the scale of measurement for a column <code class='lang-js'>column</code> to <code class='lang-js'>scale</code>. See also <a href='../index.html#scalesofmeasure'>the explanation of the different scales</a>.",
+				"usage": "var scale = stats.setScale(\"age\", \"interval\");",
+				"returns": true
+			},
+			{
+				"title": "showData()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "input",
+						"required": false
+					}
+				],
+				"content": "This method is a simple wrapper for JavaScripts&rsquo;s built in <code class='lang-js'>console.log()</code> and <code class='lang-js'>console.table()</code> methods. If <code class='lang-js'>input</code> is the name of a stored column then this will be logged, while the complete stored data will be logged in a table if no <code class='lang-js'>input</code> is supplied. For any other <code class='lang-js'>input</code>, this will simply be logged to console.",
+				"usage": "var show = stats.showData();"
+			},
+			{
+				"title": "sort()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "values",
+						"types": ["array"],
+						"required": true
+					},
+					{
+						"name": "order",
+						"types": ["string"],
+						"required": false,
+						"default": "asc"
+					}
+				],
+				"content": "A simple sorting method that is type agnostic for integers, floating point numbers and number strings. Setting <code class='lang-js'>order</code> to <code class='lang-js'>&quot;desc&quot;</code> will result in descending order.",
+				"usage": "var sorted = stats.sort([1, 3, 7, 4, 12, \"4\", 4, 7, \"9\", 6, 7, 1, 2]);",
+				"returns": "[1, 1, 2, 3, 4, \"4\", 4, 6, 7, 7, 7, \"9\", 12]"
+			},
+			{
+				"title": "sortColumn()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "column",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "order",
+						"types": ["string"],
+						"required": false,
+						"default": "asc"
+					}
+				],
+				"content": "Returns the sorted values of the column <code class='lang-js'>column</code> and does not save the change to the internal database. It&rsquo;s type agnostic for integers, floating point numbers and number strings. Setting <code class='lang-js'>order</code> to <code class='lang-js'>&quot;desc&quot;</code> will result in descending order.",
+				"usage": "var sorted = stats.sortColumn(\"age\");",
+				"returns": "[23, 28, 31, 31, 38, 45, 46, 46, 46, 51, 52, 55, 61]"
+			},
+			{
+				"title": "sortDataByColumn()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "column",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"options": [
+							{
+								"name": "data",
+								"types": ["array"],
+								"required": false,
+								"default": "stored data"
+							},
+							{
+								"name": "order",
+								"types": ["string"],
+								"required": false,
+								"default": "asc"
+							},
+							{
+								"name": "changeOriginal",
+								"types": ["boolean"],
+								"required": false,
+								"default": false
+							}
+						]
+					}
+				],
+				"content": "Sorts the data by the column <code class='lang-js'>column</code> and returns it. If the optional parameter <code class='lang-js'>changeOriginal</code> is set to <code class='lang-js'>true</code>, then its original value will be overridden with the sorted value. It&rsquo;s type agnostic for integers, floating point numbers and number strings. Setting <code class='lang-js'>order</code> to <code class='lang-js'>&quot;desc&quot;</code> will result in descending order.",
+				"usage": "var sorted = stats.sortDataByColumn('age', { order: 'desc' });",
+				"returns": "[\n\t{\n\t\tage: 42,\n\t\tgender: 'female'\n\t},\n\t{\n\t\tage: 37,\n\t\tgender: 'male'\n\t},\n\t&hellip;\n]"
+			}
+		]
+	},
+	{
+		"section": "Algebra",
+		"file": "algebra.html",
+		"items": [
+			{
+				"title": "beta()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Beta_function"],
+				"parameters": [
+					{
+						"name": "a",
+						"types": ["integer", "float"],
+						"required": true
+					},
+					{
+						"name": "b",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$${B} (a,b)=\\int _{0}^{1}t^{a-1}(1-t)^{b-1}\\,dt = \\frac {\\Gamma (a)\\,\\Gamma (b)}{\\Gamma (a+b)}$$"
+					}
+				],
+				"content": "Computes the beta function <span class='latex-formula' data-formula='$${B} (a,b)$$'></span> of two values <span class='latex-formula' data-formula='$$a$$'></span> and <span class='latex-formula' data-formula='$$b$$'></span> with <span class='latex-formula' data-formula='$$a, b > 0$$'></span>. If both variables have an integer value, <a href='#factorial'>factorials</a> instead of the <a href='#gamma'>gamma function</a> will be computed since the gamma function, even in its more exact Spouge&rsquo;s approximation, will still introdue some error.",
+				"usage": "var beta = stats.beta(4.2, 3);",
+				"returns": "0.01477&hellip;"
+			},
+			{
+				"title": "binomialCoefficient()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Binomial_coefficient"],
+				"parameters": [
+					{
+						"name": "n",
+						"types": ["integer"],
+						"required": true
+					},
+					{
+						"name": "k",
+						"types": ["integer"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$${\\binom {n}{k}}={\\frac {n!}{k!(n-k)!}} =\\prod _{i=1}^{k}{\\frac {n+1-i}{i}},$$"
+					},
+					{
+						"title": "with",
+						"formula": "$$n \\geq k \\geq 0$$"
+					}
+				],
+				"content": "Computes the binomial coefficient <span class='latex-formula' data-formula='$${\\tbinom {n}{k}}$$'></span> for two integers <code class='lang-js'>n</code> and <code class='lang-js'>k</code>. A common way to think of the binomial coefficient is that it gives the number of ways to choose <code class='lang-js'>k</code> out of <code class='lang-js'>n</code> objects regardless of order.",
+				"usage": "var nChooseK = stats.binomialCoefficient(7, 3);",
+				"returns": "35"
+			},
+			{
+				"title": "factorial()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Factorial"],
+				"parameters": [
+					{
+						"name": "n",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$n! = \\prod_{k=1}^n k = 1\\cdot 2 \\cdot 3 \\cdot\\ldots\\cdot n$$"
+					}
+				],
+				"content": "Retrieves or computes the <code class='language-js'>n</code><sup>th</sup> factorial. If <code class='language-js'>n</code> is a floating point number, the result of the <a href='#gamma'>gamma()</a> function will be returned.",
+				"usage": "var factorial = stats.factorial(16);",
+				"returns": "20922789888000"
+			},
+			{
+				"title": "gamma()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Spouge%27s_approximation", "https://en.wikipedia.org/wiki/Stirling%27s_approximation#Versions_suitable_for_calculators"],
+				"parameters": [
+					{
+						"name": "n",
+						"types": ["integer", "float"],
+						"required": true
+					},
+					{
+						"name": "moreExact",
+						"types": ["boolean"],
+						"default": false,
+						"required": false
+					}
+				],
+				"formulas": [
+					{
+						"title": "Stirling-Nemes approximation:",
+						"formula": "$${\\Gamma (n)\\approx {\\sqrt {\\frac {2\\pi }{n}}}\\left({\\frac {1}{e}}\\left(n+{\\frac {1}{12n-{\\frac {1}{10n}}}}\\right)\\right)^{n}}$$"
+					},
+					{
+						"title": "Spouge&rsquo;s approximation:",
+						"formula": "$${\\Gamma (n+1)\\approx(n+a)^{n+{\\frac {1}{2}}}e^{-n-a}\\left(\\sqrt {2\\pi }+\\sum _{k=1}^{a-1}{\\frac {c_{k}}{n+k}}\\right),}$$"
+					},
+					{
+						"title": "with",
+						"formula": "$${c_{k}={\\frac {(-1)^{k-1}}{(k-1)!}}(-k+a)^{k-{\\frac {1}{2}}}e^{-k+a}}$$"
+					},
+					{
+						"title": "and the constant a (<a href='../index.html#settings'>can be defined on initialisation</a>)"
+					}
+				],
+				"content": "Computes the gamma function for a given <code class='language-js'>n</code>. As this is can be an expensive operation, different methods can be applied to approximate the actual value. Setting <code class='language-js'>moreExact</code> to <code class='language-js'>true</code> will use Spouge&rsquo;s approximation (with <span class='latex-formula' data-formula='$${a = 40}$$'></span> by default, however, <a href='../index.html#settings'>you can define that constant upon initialisation</a>), default is to use the Stirling-Nemes approximation.",
+				"usage": "var gamma = stats.gamma(4.32, true);",
+				"returns": "9.09595&hellip;"
+			},
+			{
+				"title": "incompleteBeta()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function"],
+				"parameters": [
+					{
+						"name": "x",
+						"types": ["integer", "float"],
+						"required": true
+					},
+					{
+						"name": "a",
+						"types": ["integer", "float"],
+						"required": true
+					},
+					{
+						"name": "b",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$${{B}_{x} (a,b)=\\int _{0}^{x}t^{a-1}\\,(1-t)^{b-1}\\,dt}$$"
+					}
+				],
+				"content": "Computes the lower incomplete beta function <span class='latex-formula' data-formula='$${B}_{x} (a,b)$$'></span> of two values <span class='latex-formula' data-formula='$$a$$'></span> and <span class='latex-formula' data-formula='$$b$$'></span> with <span class='latex-formula' data-formula='$$a, b > 0$$'></span> over the interval <span class='latex-formula' data-formula='$$[0, x]$$'></span> for <span class='latex-formula' data-formula='$$0 \\leq x \\leq 1$$'></span>. This method is an implementation of the function's continued fraction representation, which usually converges fast. The number of iterations can be adjusted by declaring the <a href='../index.html#settings'>incompleteBetaIterations</a> setting upon initialisation. For <span class='latex-formula' data-formula='$$x = 1$$'></span>, its result is equal to that of the  <a href='#beta'>beta function</a> for <span class='latex-formula' data-formula='$$a$$'></span> and <span class='latex-formula' data-formula='$$b$$'></span>.",
+				"usage": "var incompleteBeta = stats.incompleteBeta(0.75, 4.2, 3);",
+				"returns": "0.01205&hellip;"
+			},
+			{
+				"title": "incompleteGamma()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Incomplete_gamma_function"],
+				"parameters": [
+					{
+						"name": "s",
+						"types": ["integer", "float"],
+						"required": true
+					},
+					{
+						"name": "x",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$\\gamma(s,x) = \\int_0^x t^{s-1}\\,e^{-t}\\,{\\rm d}t$$"
+					}
+				],
+				"content": "Computes the lower incomplete gamma function <span class='latex-formula' data-formula='$$\\gamma(s,x)$$'></span> of two values <span class='latex-formula' data-formula='$$s$$'></span> and <span class='latex-formula' data-formula='$$x$$'></span> with <span class='latex-formula' data-formula='$$x > 0$$'></span> over the interval <span class='latex-formula' data-formula='$$[0, x]$$'></span>. This method is an implementation of the function's continued fraction representation, which usually converges fast. The number of iterations can be adjusted by declaring the <a href='../index.html#settings'>incompleteGammaIterations</a> setting upon initialisation.",
+				"usage": "var incompleteGamma = stats.incompleteGamma(0.75, 4.2);",
+				"returns": "1.21543&hellip;"
+			},
+			{
+				"title": "product()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"content": "Computes the product of all the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. Elements that are not integer, a floating point number or a number string will be ignored.",
+				"usage": "var product = stats.product([1, 3, 7, 4, 12, true, 4, \"a\", 3, 6, 7, 1, 2]);",
+				"returns": "1016064 /* (true and \"a\" will be ignored) */"
+			},
+			{
+				"title": "regularisedBeta()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Beta_function#Incomplete_beta_function"],
+				"parameters": [
+					{
+						"name": "x",
+						"types": ["integer", "float"],
+						"required": true
+					},
+					{
+						"name": "a",
+						"types": ["integer", "float"],
+						"required": true
+					},
+					{
+						"name": "b",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$I_{x}(a,b)={\\frac {\\mathrm {B}_{x} (a,b)}{\\mathrm {B} (a,b)}}$$"
+					},
+					{
+						"title": "for integers a and b:",
+						"formula": "$$I_{x}(a,b)=(1-x)^{b}\\sum_{k=a}^{\\infty}\\genfrac{(}{)}{0.0pt}{}{b+k-1}{k}x^{k}$$"
+					}
+				],
+				"content": "Computes the regularised beta function <span class='latex-formula' data-formula='$${I}_{x} (a,b)$$'></span> of two values <span class='latex-formula' data-formula='$$a$$'></span> and <span class='latex-formula' data-formula='$$b$$'></span> with <span class='latex-formula' data-formula='$$a, b > 0$$'></span> over the interval <span class='latex-formula' data-formula='$$[0, x]$$'></span> for <span class='latex-formula' data-formula='$$0 \\leq x \\leq 1$$'></span>. It corresponds to the ratio of the lower <a href='#incompletebeta'>incomplete beta function</a> <span class='latex-formula' data-formula='$${B}_{x} (a,b)$$'></span> and the complete <a href='#beta'>beta function</a> <span class='latex-formula' data-formula='$${B} (a,b)$$'></span>, which will be computed if any of <code class='lang-js'>a</code> or <code class='lang-js'>b</code> is not an integer. Otherwise, it will compute the value by expanding the series representation with precision defined by <a href='../index.html#settings'>epsilon</a>.",
+				"usage": "var regularisedBeta = stats.regularisedBeta(0.75, 4.2, 3);",
+				"returns": "0.27207&hellip;"
+			},
+			{
+				"title": "regularisedGamma()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Incomplete_gamma_function#Regularized_Gamma_functions_and_Poisson_random_variables"],
+				"parameters": [
+					{
+						"name": "s",
+						"types": ["integer", "float"],
+						"required": true
+					},
+					{
+						"name": "x",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$P(s,x)=\\frac{\\gamma(s,x)}{\\Gamma(s)}$$"
+					}
+				],
+				"content": "Computes the regularised gamma function <span class='latex-formula' data-formula='$${P}(s,x)$$'></span> of two values <span class='latex-formula' data-formula='$$s$$'></span> and <span class='latex-formula' data-formula='$$x$$'></span> with <span class='latex-formula' data-formula='$$x > 0$$'></span> over the interval <span class='latex-formula' data-formula='$$[0, x]$$'></span>. It corresponds to the ratio of the lower <a href='#incompletegamma'>incomplete gamma function</a> <span class='latex-formula' data-formula='$$\\gamma(s,x)$$'></span> and the complete <a href='#gamma'>gamma function</a> <span class='latex-formula' data-formula='$${\\Gamma} (s)$$'></span>.",
+				"usage": "var regularisedGamma = stats.regularisedGamma(0.75, 4.2);",
+				"returns": "0.99185&hellip;"
+			},
+			{
+				"title": "sum()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"content": "Computes the sum of all the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. Elements that are not integer, a floating point number or a number string will be ignored. Consider using <a href='#sumexact'>sumExact()</a> for floating point numbers, as JavaScript might compute wrong results.",
+				"usage": "var sum = stats.sum([12, 9, 14, \"a\", 22, 0, -12, true]);",
+				"returns": "45 /* (\"a\" and true will be ignored) */"
+			},
+			{
+				"title": "sumExact()",
+				"lastUpdated": "1.0",
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"resources": ["https://en.wikipedia.org/wiki/Kahan_summation_algorithm"],
+				"content": "Computes the sum of all the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. Sums of floating point numbers will be computed correctly, whereas <a href='#sum'>sum()</a> might deliver incorrect results due to how JavaScript handles these numbers. This method uses Kahan&rsquo;s algorithm which diminishes the error to floating point precision that is negligable under most if not all conditions. Elements that are not integer, a floating point number or a number string will be ignored.",
+				"usage": "var sumExact = stats.sumExact([12.3, 9.0, 14.2, \"a\", 22.98, 0, -12.0000003, true]);",
+				"returns": "46.4799997 /* (\"a\" and true will be ignored) */"
+			}
+		]
+	},
+	{
+		"section": "Measures of central tendency",
+		"file": "measures.html",
+		"items": [
+			{
+				"title": "arithmeticMean()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Arithmetic_mean"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$\\bar {x}={\\frac {1}{n}}\\sum _{i=1}^{n}a_{i}={\\frac {a_{1}+a_{2}+\\cdots +a_{n}}{n}}$$"
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "Computes the arithmetic mean of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. If the scale of measure of the column given by <code class='language-js'>data</code> is not interval or of higher order, it will return <code class='language-js'>undefined</code> and throw an error. <code class='language-js'>mean()</code> is an alias of this method.",
+				"usage": "var mean = stats.arithmeticMean([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "4.69230&hellip;"
+			},
+			{
+				"title": "cubicMean()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Cubic_mean"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$\\bar {x}={\\sqrt[ {3}]{{\\frac {1}{n}}\\sum _{{i=1}}^{n}{a_{i}^{3}}}}={\\sqrt[ {3}]{{a_{1}^{3}+a_{2}^{3}+\\cdots +a_{n}^{3}} \\over n}}$$"
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "Computes the cubic mean of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. If the scale of measure of the column given by <code class='language-js'>data</code> is not interval or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var mean = stats.cubicMean([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "6.28600&hellip;"
+			},
+			{
+				"title": "gastwirthCohenMean()",
+				"lastUpdated": "1.0",
+				"stored": false,
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					},
+					{ 
+						"options":
+						[
+							{
+								"name": "alpha",
+								"types": ["integer", "float"],
+								"required": false,
+								"default": 0.25
+							},
+							{
+								"name": "lambda",
+								"types": ["integer", "float"],
+								"required": false,
+								"default": 0.25
+							}
+						]
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Computes the Gastwirth-Cohen mean of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. The Gastwirth-Cohen mean is defined as the weighted mean of three quantils:<ul><li>the <code class='language-js'>lambda</code>-weighted <code class='language-js'>alpha</code> quantil</li><li>the <code class='language-js'>(1 - alpha)</code>-quantil and</li><li>the <code class='language-js'>(1 - 2 * lambda)</code>-weighted median</li></ul> <code class='language-js'>alpha</code> and <code class='language-js'>lambda</code> must be within the range of <code class='language-js'>[0, 0.5]</code>. If the scale of measure of the column given by <code class='language-js'>data</code> is not ordinal or of higher order or if <code class='language-js'>alpha</code> or <code class='language-js'>lambda</code> are outside of the range of <code class='language-js'>[0, 0.5]</code>, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var mean = stats.gastwirthCohenMean([1, 3, 7, 4, 12, 4, 6, 7, 1, 2], { alpha: 0.3, lambda: 0.1 });",
+				"returns": "4.1"
+			},
+			{
+				"title": "geometricMean()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Geometric_mean"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "{$$\\bar {x}_{g}=\\left(\\prod _{i=1}^{n}a_{i}\\right)^{\\frac {1}{n}}={\\sqrt[{n}]{a_{1}\\cdot a_{2} \\cdots a_{n}}}$$}"
+					}
+				],
+				"scales": ["metric"],
+				"content": "Computes the geometric mean of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. If any non-positive values are supplied, this method will return <code class='language-js'>undefined</code>. If the scale of measure of the column given by <code class='language-js'>data</code> is not metric, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var mean = stats.geometricMean([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);\nvar meanWithInvalids = stats.geometricMean([0, 3, -12, 7, 9, 4, 1]);",
+				"returns": "mean: 3.74447&hellip;\nmeanWithInvalids: undefined"
+			},
+			{
+				"title": "harmonicMean()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Harmonic_mean"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$${\\bar {x}=\\frac {n}{{\\frac {1}{a_{1}}}+{\\frac {1}{a_{2}}}+\\cdots +{\\frac {1}{a_{n}}}}}={\\frac {n}{\\sum \\limits _{i=1}^{n}{\\frac {1}{a_{i}}}}}$$"
+					}
+				],
+				"scales": ["metric"],
+				"content": "Computes the harmonic mean of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. Returns <code class='language-js'>0</code> if any of the values are also <code class='language-js'>0</code>. If the scale of measure of the column given by <code class='language-js'>data</code> is not interval or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var mean = stats.harmonicMean([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "2.82901&hellip;"
+			},
+			{
+				"title": "median()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Median"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Retrieves the median of a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values.",
+				"usage": "var median = stats.median([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "4"
+			},
+			{
+				"title": "midRange()",
+				"lastUpdated": "1.0",
+				"stored": false,
+				"resources": ["https://en.wikipedia.org/wiki/Mid-range"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "Computes the mid-range of a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. If the scale of measure of the column given by <code class='language-js'>data</code> is not ordinal or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var midRange = stats.midRange([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "6.5"
+			},
+			{
+				"title": "mode()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Mode_(statistics)"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"scales": ["nominal", "ordinal", "interval", "metric"],
+				"content": "Retrieves the most frequent value in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. If there are two or more most common values of equal frequency, an array with these values will be returned.",
+				"usage": "var mode = stats.mode([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "[4, 7]"
+			},
+			{
+				"title": "rootMeanSquare()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Root_mean_square"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$\\bar {x}={\\sqrt {{\\frac {1}{n}}\\left(a_{1}^{2}+a_{2}^{2}+\\cdots +a_{n}^{2}\\right)}}$$"
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "Computes the root mean square of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. If the scale of measure of the column given by <code class='language-js'>data</code> is not interval or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var mean = stats.rootMeanSquare([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "5.54006&hellip;"
+			},
+			{
+				"title": "winsorisedMean()",
+				"lastUpdated": "1.0",
+				"stored": false,
+				"resources": ["https://en.wikipedia.org/wiki/Winsorized_mean"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					},
+					{
+
+						"name": "percentage",
+						"types": ["integer", "float"],
+						"required": false,
+						"default": 0.2
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "Computes the Winsorised (truncated) mean of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. Note, that for every truncated value of the sorted list, the now most extreme value will be repeated in its place, e.g. in a 10% truncated list of twenty values both the originally third and the 18<sup>th</sup> value in order will be repeated twice in order to replace the truncated first, second and 19<sup>th</sup> and 20<sup>th</sup> values, respectively. It&rsquo;s commonly used to discard outliers that are within the outermost <code class='language-js'>percentage</code> per cent of values on either end of the full range. <code class='language-js'>percentage</code> must be an integer or floating point number within the range of <code class='language-js'>[0, 0.5]</code>. If the scale of measure of the column given by <code class='language-js'>data</code> is not interval or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var mean = stats.winsorisedMean([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2], 0.33);",
+				"returns": "4.38461&hellip;"
+			}
+		]
+	},
+	{
+		"section": "Measures of dispersion",
+		"file": "measures.html",
+		"items": [
+			{
+				"title": "coefficientOfVariation()",
+				"lastUpdated": "1.0",
+				"stored": false,
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					},
+					{
+						"name": "expectedValue",
+						"types": ["integer", "float"],
+						"required": false
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$c _{v}=\\frac{\\sigma}{\\mu} =\\frac{\\sqrt{{\\frac {1}{n - 1}}\\sum _{i=1}^{n}(x_{i}-\\bar {x})^{2}}}{\\bar {x}},$$"
+					},
+					{
+						"title": "with",
+						"formula": "$${\\bar {x} = {\\frac {1}{n}}\\sum _{i=1}^{n}x_{i}}$$"
+					}
+				],
+				"scales": ["interval", "metric"],
+				"resources": ["https://en.wikipedia.org/wiki/Coefficient_of_variation"],
+				"content": "The coefficient of variation is a relative parameter of dispersion that expresses the <a href='#standarddeviation'>standard deviation</a> relative to the expected value of a statistical variable. This allows for comparison of variables with significantly diverse expected values. Thus, it is similar to the <a href='#indexofdispersion'>index of dispersion</a>. The expected value can either be supplied as an additional input parameter or will be substituted by the <a href='#arithmeticmean'>arithmetic mean</a>. If the scale of measure of the column given by <code class='language-js'>data</code> is not interval or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var coeffVar = stats.coefficientOfVariation([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "0.65330&hellip;"
+			},
+			{
+				"title": "cumulativeFrequency()",
+				"lastUpdated": "1.0",
+				"stored": false,
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					},
+					{
+						"name": "boundary",
+						"types": ["integer", "float"],
+						"required": false
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Counts the number of values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values that smaller or equal to <code class='language-js'>boundary</code>. If the scale of measure of the column given by <code class='language-js'>data</code> is not ordinal or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var frequency = stats.cumulativeFrequency([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2], 6);",
+				"returns": "9"
+			},
+			{
+				"title": "frequencies()",
+				"lastUpdated": "1.0",
+				"stored": false,
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"scales": ["nominal", "ordinal", "interval", "metric"],
+				"content": "Sorts the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values in descending order and returns them with their absolute and relative (in the range of <code class='language-js'>0</code> and <code class='language-js'>1</code>) frequencies.",
+				"usage": "var frequencies = stats.frequencies([\"male\", \"female\", \"male\", \"male\", \"female\", \"female\", \"indeterminate\", \"female\"]);",
+				"returns": "[\n\t{ value: \"female\", absolute: 4, relative: 0.5 },\n\t{ value: \"male\", absolute: 3, relative: 0.375 },\n\t{ value: \"indeterminate\", absolute: 1, relative: 0.125 }\n]"
+			},
+			{
+				"title": "geometricStandardDeviation()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Geometric_standard_deviation"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$\\sigma _{g}=\\exp \\left({\\sqrt {\\sum _{{i=1}}^{n}(\\ln {x_{i} \\over \\bar {x}_{g}})^{2} \\over n}}\\right),$$"
+					},
+					{
+						"title": "with the <a href='#geometricmean'>geometric mean</a>",
+						"formula": "$$\\bar {x}_{g}={\\sqrt[ {n}]{x_{1} \\cdot x_{2}\\cdots x_{n}}}$$"
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "Computes the geometric standard deviation of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. If the scale of measure of the column given by <code class='language-js'>data</code> is not interval or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var stdDev = stats.geometricStandardDeviation([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "2.05493&hellip;"
+			},
+			{
+				"title": "indexOfDispersion()",
+				"lastUpdated": "1.0",
+				"stored": false,
+				"resources": ["https://en.wikipedia.org/wiki/Index_of_dispersion"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					},
+					{
+						"name": "expectedValue",
+						"types": ["integer", "float"],
+						"required": false
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$D=\\frac{\\sigma^{2}}{\\mu} =\\frac{{\\frac {1}{n - 1}}\\sum _{i=1}^{n}(x_{i}-\\bar {x})^{2}}{\\bar {x}},$$"
+					},
+					{
+						"title": "with",
+						"formula": "$${\\bar {x} = {\\frac {1}{n}}\\sum _{i=1}^{n}x_{i}}$$"
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "The index of dispersion is a relative parameter of dispersion that expresses the <a href='#variance'>variance</a> relative to the expected value of a statistical variable. This allows for comparison of variables with significantly diverse expected values. Thus, it is similar to the <a href='#coefficientofvariation'>coefficient of variation</a>. The expected value can either be supplied as an additional input parameter or will be substituted by the <a href='#arithmeticmean'>arithmetic mean</a>. If the scale of measure of the column given by <code class='language-js'>data</code> is not interval or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var indexDisp = stats.indexOfDispersion([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "2.00273&hellip;"
+			},
+			{
+				"title": "interQuartileRange()",
+				"lastUpdated": "1.0",
+				"stored": false,
+				"resources": ["https://en.wikipedia.org/wiki/Interquartile_range"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "Computes the interquartile range of a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. If the scale of measure of the column given by <code class='language-js'>data</code> is not ordinal or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var interQuartileRange = stats.interQuartileRange([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "4"
+			},
+			{
+				"title": "maximum()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Finds the largest among the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. If the scale of measure of the column given by <code class='language-js'>data</code> is not ordinal or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var min = stats.maximum([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "12"
+			},
+			{
+				"title": "medianAbsoluteDeviation()",
+				"lastUpdated": "1.0",
+				"stored": false,
+				"resources": ["https://en.wikipedia.org/wiki/Median_absolute_deviation"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "Computes the median absolute deviation of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. If the scale of measure of the column given by <code class='language-js'>data</code> is not interval or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var medDev = stats.medianAbsoluteDeviation([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "2"
+			},
+			{
+				"title": "minimum()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Finds the smallest among the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. If the scale of measure of the column given by <code class='language-js'>data</code> is not ordinal or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var min = stats.minimum([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "1"
+			},
+			{
+				"title": "quantile()",
+				"lastUpdated": "1.0",
+				"stored": false,
+				"resources": ["https://en.wikipedia.org/wiki/Quantile"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					},
+					{
+						"name": "percentage",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Computes the quantiles of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. The <code class='language-js'>percentage</code> should be given as an integer or floating point number between <code class='language-js'>0</code> and <code class='language-js'>1</code>. If the scale of measure of the column given by <code class='language-js'>data</code> is not ordinal or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var quantile = stats.quantile([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2], 0.33);",
+				"returns": "3"
+			},
+			{
+				"title": "quartiles()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Quartile"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Computes the quartiles of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values and returns them as an array with the lower quartile at the 0<sup>th</sup> index and the higher quartile at the 1<sup>st</sup> index. If the scale of measure of the column given by <code class='language-js'>data</code> is not ordinal or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var mode = stats.quartiles([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "[3, 7]"
+			},
+			{
+				"title": "range()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Range_(statistics)"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Computes the range of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values, defined as the difference of their maximum and their minimum. If the scale of measure of the column given by <code class='language-js'>data</code> is nominal, it will retrieve an array of all the unique values in the dataset instead. ",
+				"usage": "var range = stats.range([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "11"
+			},
+			{
+				"title": "standardDeviation()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Standard_deviation"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					},
+					{
+						"name": "corrected",
+						"types": ["boolean", "integer", "float"],
+						"required": false,
+						"default": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$${\\sigma = \\sqrt {{Var} (X)}=\\sqrt{{\\frac {1}{n - 1}}\\sum _{i=1}^{n}(x_{i}-\\bar {x} )^{2}},}$$"
+					},
+					{
+						"title": "with",
+						"formula": "$${\\bar {x} = {\\frac {1}{n}}\\sum _{i=1}^{n}x_{i}}$$"
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "Computes the standard deviation of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. By default, the arithmetic mean is computed for <span class='latex-formula' data-formula='$${\\bar {x}}$$'></span> and Bessel&rsquo;s correction is applied. This is the best option if the <em>true</em> arithmetic mean within the population is a priori unknown and can only be approximated by the arithmetic mean of the sample. If <code class='lang-js'>corrected</code> is set to <code class='lang-js'>false</code>, Bessel&rsquo;s correction will not be applied, effectively computing the population variance with an unknown arithmetic mean. If <code class='language-js'>corrected</code> is set to an integer or a floating point number, this will be used as the true mean and Bessel&rsquo;s correction will not be applied. If the scale of measure of the column given by <code class='language-js'>data</code> is not interval or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var variance = stats.standardDeviation([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "3.06552&hellip;"
+			},
+			{
+				"title": "variance()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Variance", "https://en.wikipedia.org/wiki/Bessel%27s_correction"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					},
+					{
+						"name": "corrected",
+						"types": ["boolean", "integer", "float"],
+						"required": false,
+						"default": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$${{Var} (X)=\\sigma^{2} = {\\frac {1}{n - 1}}\\sum _{i=1}^{n}(x_{i}-\\bar {x} )^{2},}$$"
+					},
+					{
+						"title": "with",
+						"formula": "$${\\bar {x} = {\\frac {1}{n}}\\sum _{i=1}^{n}x_{i}}$$"
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "Computes the variance of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. By default, the arithmetic mean is computed for <span class='latex-formula' data-formula='$${\\bar {x}}$$'></span> and Bessel&rsquo;s correction is applied. This is the best option if the <em>true</em> arithmetic mean within the population is a priori unknown and can only be approximated by the arithmetic mean of the sample. In that case, the numerically stable Welford&rsquo;s method is used which yields a correct result even for very large datasets and very large numbers. If <code class='lang-js'>corrected</code> is set to <code class='lang-js'>false</code>, Bessel&rsquo;s correction will not be applied, effectively computing the population variance with an unknown arithmetic mean. If <code class='language-js'>corrected</code> is set to an integer or a floating point number, this will be used as the true mean and Bessel&rsquo;s correction will not be applied. If the scale of measure of the column given by <code class='language-js'>data</code> is not interval or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var variance = stats.variance([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "9.39743&hellip;"
+			}
+		]
+	},
+	{
+		"section": "Measures of shape",
+		"file": "measures.html",
+		"items": [
+			{
+				"title": "excessKurtosis()",
+				"lastUpdated": "1.0",
+				"stored": false,
+				"resources": ["https://en.wikipedia.org/wiki/Kurtosis#Excess_kurtosis"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$k_{excess} = \\frac1n \\sum_{i=1}^n \\left(\\frac{x_i-\\bar{x}}{s}\\right)^4 - 3$$"
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Computes the excess kurtosis of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. This measure was introduced to compare the shape of a distribution to that of the normal distribution. It is defined as the <a href='#kurtosis'>kurtosis</a> <span class='latex-formula' data-formula='$${k - 3}$$'></span> and can make three basic descriptions:<ul><li><span class='latex-formula' data-formula='$$k_{excess} = 0$$'></span> (<em>mesokurtic</em>): the bell shape of the normal distribution</li><li><span class='latex-formula' data-formula='$$k_{excess} > 0$$'></span> (<em>leptokurtic</em>): a more slender and steep shape</li><li><span class='latex-formula' data-formula='$$k_{excess} < 0$$'></span> (<em>platykurtic</em>): a more flat and wide shape</li></ul> If the scale of measure of the column given by <code class='language-js'>data</code> is not ordinal or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var excess = stats.excessKurtosis([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "-0.05486&hellip;"
+			},
+			{
+				"title": "kurtosis()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Kurtosis"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$k = \\frac1n \\sum_{i=1}^n \\left(\\frac{x_i-\\bar{x}}{s}\\right)^4$$"
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Computes the kurtosis of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. If the scale of measure of the column given by <code class='language-js'>data</code> is not ordinal or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var kurtosis = stats.kurtosis([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "2.94513&hellip;"
+			},
+			{
+				"title": "skewness()",
+				"lastUpdated": "1.0",
+				"stored": true,
+				"resources": ["https://en.wikipedia.org/wiki/Skewness#Sample_skewness"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					},
+					{
+						"name": "populationSkewness",
+						"types": ["boolean"],
+						"required": false,
+						"default": false
+					}
+				],
+				"formulas": [
+					{
+						"title": "Sample skewness",
+						"formula": "$$\\nu = \\frac{\\frac{1}{n} \\sum_{i = 1}^{n} (x_{i} - \\bar{x})^{3}}{\\sqrt{\\frac{1}{n-1}\\sum_{i = 1}^{n} (x_{i} - \\bar{x})^{2}}^{3}}$$"
+					},
+					{
+						"title": "Sample population skewness",
+						"formula": "$$\\nu = \\frac{n}{(n - 1)\\cdot(n - 2)}\\cdot \\frac{\\sum_{i = 1}^{n} (x_{i} - \\bar{x})^{3}}{\\sqrt{\\frac{1}{n-1}\\sum_{i = 1}^{n} (x_{i} - \\bar{x})^{2}}^{3}}$$"
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Computes the sample skewness of the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values. There are several definitions of skewness, however this toolkit uses the sample skewness if <code class='lang-js'>populationSkewness</code> is set to <code class='lang-js'>false</code> and the adjusted Fisher-Pearson standardised moment coefficient for the sample skewness if it&rsquo;s set to <code class='lang-js'>true</code>. If the scale of measure of the column given by <code class='language-js'>data</code> is not ordinal or of higher order, it will return <code class='language-js'>undefined</code> and throw an error.",
+				"usage": "var skewness = stats.skewness([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "1.02037&hellip;"
+			}
+		]
+	},
+	{
+		"section": "Distributions",
+		"file": "distributions.html",
+		"items": [
+			{
+				"title": "binomialDistribution()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Binomial_distribution"],
+				"parameters": [
+					{
+						"name": "n",
+						"types": ["integer"],
+						"required": false,
+						"default": 10
+					},
+					{
+						"name": "probability",
+						"types": ["integer", "float"],
+						"required": false,
+						"default": 0.5
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$${\\displaystyle P(k;n,p)=P(X=k)={n \\choose k}p^{k}(1-p)^{n-k}}$$"
+					}
+				],
+				"content": "Computes the binomial distribution for a given <code class='lang-js'>n</code> and <code class='lang-js'>probability</code> where the element at the index <code class='lang-js'>k</code> corresponds to the probability that out of <code class='lang-js'>n</code> independent trials exactly <code class='lang-js'>k</code> are successful, when each of them has an individual <code class='lang-js'>probability</code>. This method returns an array of floating point numbers with their indices <span class='latex-formula' data-formula='$$k = 0, 1, 2...$$'></span>. See the above link for more information about the binomial distribution&rsquo;s statistical properties including mean, variance etc.<br><br>If you want to calculate only one value for a particular <span class='latex-formula' data-formula='$$k$$'></span> use <code class='lang-js'>binomialProbabilityMass(k, n, probability)</code> (see example).",
+				"usage": "var distribution = stats.binomialDistribution(5, 0.5);\n// probabilities of k = 0, 1, … 5 out of 5 coin tosses are heads\n\nvar single = stats.binomialProbabilityMass(12, 22, 0.4);\n// the probability of exactly 12 out of 22 succesful events,\n// each with a probability to occur of 0.4",
+				"returns": "distribution: [ 0.03125, 0.15625, 0.3125, 0.3125, 0.15625, 0.03125 ]\nsingle: 0.06559&hellip;"
+			},
+			{
+				"title": "binomialCumulativeDistribution()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Binomial_distribution"],
+				"parameters": [
+					{
+						"name": "n",
+						"types": ["integer"],
+						"required": false,
+						"default": 10
+					},
+					{
+						"name": "probability",
+						"types": ["integer", "float"],
+						"required": false,
+						"default": 0.5
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$${\\displaystyle P(k;n,p)=P(X=k)={n \\choose k}p^{k}(1-p)^{n-k}}$$"
+					}
+				],
+				"content": "Computes the binomial cumulative distribution for a given <code class='lang-js'>n</code> and <code class='lang-js'>probability</code> where the element at the index <code class='lang-js'>k</code> corresponds to the probability that out of <code class='lang-js'>n</code> independent trials no more than <code class='lang-js'>k</code> are successful, when each of them has an individual <code class='lang-js'>probability</code>. This method returns an array of floating point numbers with their indices <span class='latex-formula' data-formula='$$k = 0, 1, 2...$$'></span>.<br><br>If you want to calculate only one value for a particular <span class='latex-formula' data-formula='$$k$$'></span> use <code class='lang-js'>binomialCumulativeValue(k, n, probability)</code> (see example).",
+				"usage": "var distribution = stats.binomialCumulativeDistribution(5, 0.5);\n// probabilities of k &le; 0, 1, … 5 out of 5 coin tosses are heads\n\nvar single = stats.binomialCumulativeValue(12, 22, 0.4);\n// the probability of no more than 12 out of 22 succesful events,\n// each with a probability to occur of 0.4",
+				"returns": "distribution: [ 0.03125, 0.1875, 0.5, 0.8125, 0.96875, 1 ]\nsingle: 0.94489&hellip;"
+			},
+			{
+				"title": "chiSquaredDistribution()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Chi-squared_distribution"],
+				"parameters": [
+					{
+						"name": "df",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$${\\displaystyle f(x;\\,\\nu)={\\begin{cases}{\\dfrac {x^{(\\nu/2-1)}e^{-x/2}}{2^{\\nu/2}\\Gamma \\left({\\frac {\\nu}{2}}\\right)}},&x>0;\\\\0,&x\\leq0.\\end{cases}}}$$"
+					}
+				],
+				"content": "Computes the Chi squared distribution for a given degree of freedom (<span class='latex-formula' data-formula='$$\\nu$$'></span>) <code class='lang-js'>df</code> and returns an object where each property <code class='lang-js'>x</code> stores the value <span class='latex-formula' data-formula='$$f(x|\\nu)$$'></span> in steps of 0.01 starting at <code class='lang-js'>0</code> until <span class='latex-formula' data-formula='$$f(x|\\nu)\\leq epsilon$$'></span> (<a href='../index.html#settings'>with the threshhold parameter epsilon</a>).<br><br>If you want to calculate only one value for a particular <span class='latex-formula' data-formula='$$x$$'></span> use <code class='lang-js'>chiSquaredProbabilityDensity(x, df)</code> (see example).",
+				"usage": "var distribution = stats.chiSquaredDistribution(3);\nvar single = stats.chiSquaredProbabilityDensity(4.3, 19);",
+				"returns": "distribution: {\n\t0.00: 0,\n\t0.01: 0.03969&hellip;,\n\t0.02: 0.05585&hellip;,\n\t0.03: 0.06807&hellip;\n}\nsingle: 0.00032&hellip;"
+			},
+			{
+				"title": "chiSquaredCumulativeDistribution()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Chi-squared_distribution"],
+				"parameters": [
+					{
+						"name": "df",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$F(x;\\,\\nu)={\\frac {\\gamma ({\\frac {\\nu}{2}},\\,{\\frac {x}{2}})}{\\Gamma ({\\frac {\\nu}{2}})}}=P\\left({\\frac {\\nu}{2}},\\,{\\frac {x}{2}}\\right)$$"
+					}
+				],
+				"content": "Computes the Chi squared cumulative distribution for a given degree of freedom (<span class='latex-formula' data-formula='$$\\nu$$'></span>) <code class='lang-js'>df</code> and returns an object where each property <code class='lang-js'>x</code> stores the value <span class='latex-formula' data-formula='$$f(x|\\nu)$$'></span> in steps of 0.01 starting at <code class='lang-js'>0</code> until <span class='latex-formula' data-formula='$$f(x|\\nu)\\geq 1 - epsilon$$'></span> (<a href='../index.html#settings'>with the threshhold parameter epsilon</a>).<br><br>If you want to calculate only one value for a particular <span class='latex-formula' data-formula='$$x$$'></span> use <code class='lang-js'>chiSquaredCumulativeValue(x, df)</code> (see example). Be aware, that this method will compute incorrect results for very small <code class='lang-js'>x</code> due to numerical error imposed by JavaScript&rsquo;s numerical precision. <code class='lang-js'>chiSquaredCumulativeDistribution()</code> will not return these values, instead start at the first correct index, e.g. at <code class='lang-js'>0.04</code>.",
+				"usage": "var distribution = stats.chiSquaredCumulativeDistribution(3);\nvar single = stats.chiSquaredCumulativeValue(4.3, 19);",
+				"returns": "distribution: {\n\t0.00: 0,\n\t0.04: 0.00128&hellip;,\n\t0.05: 0.00318&hellip;,\n\t0.06: 0.00429&hellip;\n}\nsingle: 0.76916&hellip;"
+			},
+			{
+				"title": "normalDistribution()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Normal_distribution"],
+				"parameters": [
+					{
+						"name": "mean",
+						"types": ["integer", "float"],
+						"required": false,
+						"default": 0
+					},
+					{
+						"name": "variance",
+						"types": ["integer", "float"],
+						"required": false,
+						"default": 1
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$${\\mathcal {N}}(\\mu ,\\sigma ^{2}) = {\\displaystyle f(x|\\mu ,\\sigma ^{2})={\\frac {1}{\\sqrt {2\\pi \\sigma ^{2}}}}\\;e^{-{\\frac {(x-\\mu )^{2}}{2\\sigma ^{2}}}}}$$"
+					}
+				],
+				"content": "Computes the normal distribution for a given <code class='lang-js'>mean</code> <span class='latex-formula' data-formula='$$\\mu$$'></span> and <code class='lang-js'>variance</code> <span class='latex-formula' data-formula='$$\\sigma^{2}$$'></span> and returns an object where each property <code class='lang-js'>x</code> stores the value <span class='latex-formula' data-formula='$$f(x|\\mu, \\sigma^{2})$$'></span> in steps of 0.01 extending left and right from <code class='lang-js'>mean</code> until <span class='latex-formula' data-formula='$$f(x|\\mu, \\sigma^{2})\\leq \\epsilon$$'></span> (<a href='../index.html#settings'>with the threshhold parameter epsilon</a>, e.g. for the default value of <span class='latex-formula' data-formula='$$\\epsilon = 0.00001$$'></span> this will cover values within about 4.3 standard deviations from the mean).<br><br>If you want to calculate only one value for a particular <span class='latex-formula' data-formula='$$x$$'></span> use <code class='lang-js'>normalProbabilityDensity(x, mean, variance)</code> (see example).",
+				"usage": "var distribution = stats.normalDistribution(0, 0.3);\nvar single = stats.normalProbabilityDensity(1.4, 2, 4);",
+				"returns": "distribution: {\n\t-2.59: 0.000010&hellip;,\n\t-2.58: 0.000011&hellip;,\n\t-2.57: 0.000012&hellip;,\n\t&hellip;\n\t0.00: 0.728365&hellip;,\n\t&hellip;\n\t2.57: 0.000012&hellip;,\n\t2.58: 0.000011&hellip;,\n\t2.59: 0.000010&hellip;\n}\nsingle: 0.19069&hellip;"
+			},
+			{
+				"title": "normalCumulativeDistribution()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Normal_distribution#Cumulative_distribution_function", "https://en.wikipedia.org/wiki/Standard_normal_table#Cumulative"],
+				"stored": true,
+				"formulas": [
+					{
+						"formula": "$${\\displaystyle \\Phi (z)={\\frac {1}{\\sqrt {2\\pi }}}\\int _{-\\infty }^{z}e^{-t^{2}/2}\\,dt}$$"
+					}
+				],
+				"content": "Returns an object containing the values of the cumulative normal distribution for values of <span class='latex-formula' data-formula='$$z$$'></span> with <span class='latex-formula' data-formula='$$0 \\leq z\\leq 4.09$$'></span> in steps of <span class='latex-formula' data-formula='$$0.01$$'></span>. The standard normal table generated by this method can be used to calculate the probability that a normally distributed statistic is less than <span class='latex-formula' data-formula='$$z$$'></span>. The probability that a normally distributed statistic is greater than <span class='latex-formula' data-formula='$$z$$'></span> can &ndash; due to the symmetry of the function &ndash; be simply derived through <span class='latex-formula' data-formula='$$\\Phi(-z) = 1 - \\Phi(z)$$'></span>. Likewise, the probability that a statistic is between <span class='latex-formula' data-formula='$$0$$'></span> (the arithmetic mean) and <span class='latex-formula' data-formula='$$z$$'></span> can be derived as <span class='latex-formula' data-formula='$$\\Phi(z_{mean}) = \\Phi(z) - \\frac{1}{2}$$'></span>. <a href='error.html#probit'>See probit</a> to calculate values of the inverse function.<br><br>If you want to calculate only one value for a particular <span class='latex-formula' data-formula='$$z$$'></span> use <code class='lang-js'>normalCumulativeValue(z)</code> (see example).",
+				"usage": "var distribution = stats.normalCumulativeDistribution();\nvar single = stats.normalCumulativeValue(1.4);",
+				"returns": "distribution: {\n\t0.00: 0.5,\n\t0.01: 0.50399&hellip;,\n\t0.02: 0.50798&hellip;,\n\t&hellip;\n}\nsingle: 0.91924&hellip;"
+			},
+			{
+				"title": "poissonDistribution()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Poisson_distribution"],
+				"parameters": [
+					{
+						"name": "lambda",
+						"types": ["integer", "float"],
+						"required": false,
+						"default": 1
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$\\!f(k;\\lambda )=\\Pr(X=k)={\\frac {\\lambda ^{k}e^{-\\lambda }}{k!}}$$"
+					}
+				],
+				"content": "Computes the Poisson distribution for a given <code class='lang-js'>lambda</code> and returns an array of floating point numbers with their indices <span class='latex-formula' data-formula='$$k = 0, 1, 2...$$'></span> for <span class='latex-formula' data-formula='$$n$$'></span> such as <span class='latex-formula' data-formula='$$P(k \\leq n) \\leq 1 - \\epsilon$$'></span> (<a href='../index.html#settings'>with the threshhold parameter epsilon</a>). See the above link for more information about the Poisson distribution&rsquo;s statistical properties including mean, variance etc.<br><br>If you want to calculate only one value for a particular <span class='latex-formula' data-formula='$$k$$'></span> use <code class='lang-js'>poissonProbabilityMass(k, lambda)</code> (see example).",
+				"usage": "var distribution = stats.poissonDistribution(0.3);\n// probabilities that an event which happens at a rate of 0.3 per time interval\n// will be observed k = 0, 1, &hellip; times in that interval\n\nvar single = stats.poissonProbabilityMass(2, 4);",
+				"returns": "distribution: [ 0.74081&hellip;, 0.22224&hellip;, 0.03333&hellip;, 0.00333&hellip;, 0.00025&hellip;, 0.00001&hellip; ]\nsingle: 0.14652&hellip;"
+			},
+			{
+				"title": "poissonCumulativeDistribution()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Poisson_distribution"],
+				"parameters": [
+					{
+						"name": "lambda",
+						"types": ["integer", "float"],
+						"required": false,
+						"default": 1
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$\\!f(k;\\lambda )=\\Pr(X\\leq k)=e^{-\\lambda }\\sum _{i=0}^{\\lfloor k\\rfloor }{\\frac {\\lambda ^{i}}{i!}}$$"
+					}
+				],
+				"content": "Computes the cumulative Poisson distribution for a given <code class='lang-js'>lambda</code> and returns an array of floating point numbers with their indices <span class='latex-formula' data-formula='$$k = 0, 1, 2...$$'></span> for <span class='latex-formula' data-formula='$$n$$'></span> such as <span class='latex-formula' data-formula='$$P(k = 0, 1, ..., n - 1, n) \\leq 1 - \\epsilon$$'></span> (<a href='../index.html#settings'>with the threshhold parameter epsilon</a>).<br><br>If you want to calculate only one value for a particular <span class='latex-formula' data-formula='$$k$$'></span> use <code class='lang-js'>poissonCumulativeValue(k, lambda)</code> (see example).",
+				"usage": "var distribution = stats.poissonCumulativeDistribution(0.3);\n// probabilities that an event which happens at a rate of 0.3 per time interval\n// will be observed up to k = 0, 1, &hellip; times in that interval\n\nvar single = stats.poissonCumulativeValue(2, 4);",
+				"returns": "distribution: [ 0.74081&hellip;, 0.96306&hellip;, 0.99640&hellip;, 0.99973&hellip;, 0.99998&hellip;, 0.99999&hellip; ]\nsingle: 0.23810&hellip;"
+			},
+			{
+				"title": "studentsTDistribution()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Student%27s_t-distribution#Probability_density_function"],
+				"parameters": [
+					{
+						"name": "df",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$f(t) = \\frac{\\Gamma(\\frac{\\nu+1}{2})} {\\sqrt{\\nu\\pi}\\,\\Gamma(\\frac{\\nu}{2})} \\left(1+\\frac{t^2}{\\nu} \\right)^{\\!-\\frac{\\nu+1}{2}}\\!$$"
+					}
+				],
+				"content": "Computes the Student&rsquo;s t-distribution for a given degree of freedom (<span class='latex-formula' data-formula='$$\\nu$$'></span>) <code class='lang-js'>df</code> and returns an object where each property <code class='lang-js'>t</code> stores the value <span class='latex-formula' data-formula='$$f(t|\\nu)$$'></span> in steps of 0.01 extending left and right from <code class='lang-js'>0</code> until <span class='latex-formula' data-formula='$$f(t|\\nu)\\leq epsilon$$'></span> (<a href='../index.html#settings'>with the threshhold parameter epsilon</a>).<br><br>If you want to calculate only one value for a particular <span class='latex-formula' data-formula='$$t$$'></span> use <code class='lang-js'>studentsTProbabilityDensity(t, df)</code> (see example).",
+				"usage": "var distribution = stats.studentsTDistribution(12);\nvar single = stats.studentsTProbabilityDensity(0.7, 19);",
+				"returns": "distribution: {\n\t-7.00: 0.00001&hellip;,\n\t-6.99: 0.00001&hellip;,\n\t-6.98: 0.00001&hellip;,\n\t&hellip;\n\t0.00: 0.38910&hellip;,\n\t&hellip;\n\t6.98: 0.00001&hellip;,\n\t6.99: 0.00001&hellip;,\n\t7.00: 0.00001&hellip;\n}\nsingle: 0.30522&hellip;"
+			},
+			{
+				"title": "studentsTCumulativeDistribution()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Student%27s_t-distribution#Cumulative_distribution_function"],
+				"parameters": [
+					{
+						"name": "df",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$${\\displaystyle F(t)=\\int _{-\\infty }^{t}f(u)\\,du=1-{\\tfrac {1}{2}}I_{\\frac{\\nu}{{t^2+\\nu}}}\\left({\\tfrac {\\nu }{2}},{\\tfrac {1}{2}}\\right)}$$"
+					}
+				],
+				"content": "Computes the Student&rsquo;s cumulative t-distribution for a given degree of freedom (<span class='latex-formula' data-formula='$$\\nu$$'></span>) <code class='lang-js'>df</code> and returns an object where each property <code class='lang-js'>t</code> stores the value <span class='latex-formula' data-formula='$$f(t|\\nu)$$'></span> in steps of 0.01 extending left and right from <code class='lang-js'>0</code> until <span class='latex-formula' data-formula='$$f(t|\\nu)\\geq 1 - epsilon$$'></span> (<a href='../index.html#settings'>with the threshhold parameter epsilon</a>).<br><br>If you want to calculate only one value for a particular <span class='latex-formula' data-formula='$$t$$'></span> use <code class='lang-js'>studentsTCumulativeValue(t, df)</code> (see example). Be aware, that this method will compute exact results only for reasonably small <code class='lang-js'>t</code> due to numerical error imposed by JavaScript&rsquo;s numerical precision. This will affect in too low calculations of values for <code class='lang-js'>t</code> well beyond usual t-scores (e.g. <span class='latex-formula' data-formula='$$t > 14$$'></span> for <span class='latex-formula' data-formula='$$\\nu = 5$$'></span> etc.) where the actual result would have to be very close to 1.",
+				"usage": "var distribution = stats.studentsTCumulativeDistribution(12);\nvar single = stats.studentsTCumulativeValue(0.7, 19);",
+				"returns": "distribution: {\n\t-6.77: 0.999990&hellip;,\n\t-6.76: 0.999989&hellip;,\n\t-6.75: 0.999989&hellip;,\n\t&hellip;\n\t0.00: 0.5,\n\t&hellip;\n\t6.75: 0.999989&hellip;,\n\t6.76: 0.999989&hellip;,\n\t6.77: 0.999990&hellip;\n}\nsingle: 0.75379&hellip;"
+			}
+		]
+	},
+	{
+		"section": "Correlation",
+		"file": "correlation.html",
+		"items": [
+			{
+				"title": "correlationCoefficient()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Pearson_correlation_coefficient"],
+				"scales": ["interval", "metric"],
+				"parameters": [
+					{
+						"name": "firstColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "secondColumn",
+						"types": ["string"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$${\\displaystyle r={\\frac {\\sum _{i=1}^{n}(x_{i}-{\\bar {x}})(y_{i}-{\\bar {y}})}{{\\sqrt {\\sum _{i=1}^{n}(x_{i}-{\\bar {x}})^{2}}}{\\sqrt {\\sum _{i=1}^{n}(y_{i}-{\\bar {y}})^{2}}}}}}$$"
+					}
+				],
+				"content": "Computes Pearson&rsquo;s correlation coefficient of two variables given by their column names <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code> which is a measure for the linear dependence of both variables. It assumes that both variables follow a normal distribution, otherwise a rank correlation measure needs to be calculated instead. Its value for <span class='latex-formula' data-formula='$$r$$'></span> is in the interval <span class='latex-formula' data-formula='$$[-1, 1]$$'></span>, with a value of -1 implying total negative linear correlation, a value of 0 for no linear correlation and a value of 1 for total positive linear correlation. This method will ignore any missing values and report its number along the correlation coefficient in a common object.",
+				"usage": "var bodyMeasurements = [\n\t{ weight: 63, height: 1.65 },\n\t{ weight: 64, height: 1.67 },\n\t{ weight: 74, height: 1.80 },\n\t{ weight: 79, height: 1.82 },\n\t{ weight: 82, height: 1.86 },\n\t{ weight: 66, height: 1.70 },\n\t{ weight: 91, height: 1.83 },\n\t{ weight: 72, height: 1.76 },\n\t{ weight: 85, height: 1.89 },\n\t{ weight: 68, height: 1.68 }\n];\n\nvar bodyVars = {\n\tweight: 'metric',\n\theight: 'metric'\n};\n\nvar stats = new Statistics(bodyMeasurements, bodyVars);\nvar r = stats.correlationCoefficient('weight', 'height');",
+				"returns": "{\n\tcorrelationCoefficient: 0.91258&hellip;\n\tmissings: 0\n}"
+			},
+			{
+				"title": "covariance()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Covariance#Calculating_the_sample_covariance"],
+				"parameters": [
+					{
+						"name": "firstColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "secondColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "corrected",
+						"types": ["boolean"],
+						"required": false,
+						"default": true
+					}
+				],
+				"formulas": [
+					{
+						"title": "Sample covariance",
+						"formula": "$$\\sigma_{{xy}}={\\frac {1}{n}}\\sum _{{i=1}}^{n}{(x_{i}-{\\bar {x}})(y_{i}-{\\bar {y}})}$$"
+					},
+					{
+						"title": "Corrected sample covariance",
+						"formula": "$${\\hat {\\sigma }}_{{xy}}={\\frac {1}{n-1}}\\sum _{{i=1}}^{n}{(x_{i}-{\\bar {x}})(y_{i}-{\\bar {y}})}$$"
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "Computes the covariance of two variables given by their column names <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code>. If <code class='lang-js'>corrected</code> is set to <code class='lang-js'>true</code>, the corrected sample covariance will be calculated. This is the suitable method if the covariance should be estimated for the whole population, while the uncorrected sample covariance is often the better choice for a merely descriptive measure. A positive value indicates a concordant linear coherence, while a negative value indicates a discordant linear coherence between the two variables. A value of zero suggests no linear coherence between the two variables. It is worth noting that this measure does not account for non-linear coherences and that the size of the covariance can not suggest the strength of the coherence. If this strength should be evaluated, consider calculating the <a href='#correlationcoefficient'>correlation coefficient</a>.",
+				"usage": "var covariance = stats.covariance('weight', 'height');\n// same data as in example for the correlationCoefficient() method",
+				"returns": "{\n\tcovariance: 0.75177&hellip;,\n\tmissings: 0\n}"
+			},
+			{
+				"title": "fisherTransformation()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Fisher_transformation"],
+				"parameters": [
+					{
+						"name": "coeff",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$z=\\frac{1}{2}\\ln \\left({\\frac{1+r}{1-r}}\\right)=\\operatorname {arctanh}(r)$$"
+					}
+				],
+				"content": "Applies the Fisher transformation for a given correlation coefficient r. In some cases, it can also be used for <a href='#spearmansrho'>Spearman&rsquo;s rank correlation coefficient</a>. Since it&rsquo;s defined as <span class='latex-formula' data-formula='$${arctanh}(r)$$'></span> this method is merely a wrapper for <code class='lang-js'>Math.atanh(r)</code> extending it with input validation and offering a polyfill.",
+				"usage": "var transform = stats.fisherTransformation(0.3);",
+				"returns": "0.30951&hellip;"
+			},
+			{
+				"title": "goodmanKruskalsGamma()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Goodman_and_Kruskal%27s_gamma"],
+				"parameters": [
+					{
+						"name": "firstColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "secondColumn",
+						"types": ["string"],
+						"required": true
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Computes Goodman and Kruskal&rsquo;s Gamma for two variables given by <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code>. It is a measure for rank correlation of two variables and thus similar to Kendall&rsquo;s Tau, however it is generally a poorer measure since it does not account for ties (and is equal to Kendall&rsquo;s Tau a if no ties are present in the ranked data). Goodman and Kruskal&rsquo;s Gamma is defined over a range of <span class='latex-formula' data-formula='$$[-1, 1]$$'></span>, with a value of -1 implying total disgreement, a value of 0 for total independence and a value of 1 for total agreement between two variables. Returns an object containing the value for <code class='lang-js'>gamma</code>, the approximated t statistic <code class='lang-js'>t</code> and both one- and two-sided significance levels under the assumption of a <a href='distributions.html#studentstdistribution'>Student&rsquo;s t-distributed</a> null hypothesis.",
+				"usage": "var testData = [\n\t{ satisfaction: 0, affordability: 0 },\n\t{ satisfaction: 1, affordability: 2 },\n\t{ satisfaction: 9, affordability: 8 },\n\t{ satisfaction: 2, affordability: 3 },\n\t{ satisfaction: 6, affordability: 1 },\n\t{ satisfaction: 4, affordability: 5 },\n\t{ satisfaction: 3, affordability: 4 },\n\t{ satisfaction: 5, affordability: 6 },\n\t{ satisfaction: 7, affordability: 9 },\n\t{ satisfaction: 8, affordability: 7 }\n];\n\nvar testVars = { satisfaction: 'ordinal', affordability: 'ordinal' };\n\nvar stats = new Statistics(testData, testVars);\nvar gamma = stats.goodmanKruskalsGamma('satisfaction', 'affordability');",
+				"returns": "{\n\tgamma: 0.68888&hellip;,\n\ttStatistic: 2.01603&hellip;,\n\tpOneTailed: 0.03927&hellip;,\n\tpTwoTailed: 0.07854&hellip;,\n\tmissings: 0\n}"
+			},
+			{
+				"title": "kendallsTau()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Kendall_rank_correlation_coefficient"],
+				"parameters": [
+					{
+						"name": "firstColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "secondColumn",
+						"types": ["string"],
+						"required": true
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Computes the Kendall rank correlation coefficient (in short, Kendall&rsquo;s tau) for two variables given by <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code>. It it similar to <a href='#spearmansrho'>Spearman&rsquo;s rho</a>, however, it does not account for the rank differences but for their comparisons. It is usually smaller than Spearman&rsquo;s rho, but is a more robust measure if the variables are not normally distributed, their scales are very different or if the small sample size is small.<br><br>This method returns an object for three different parameters Tau a, Tau b and Tau c, all of which defined over a range of <span class='latex-formula' data-formula='$$[-1, 1]$$'></span>, with a value of -1 implying total disgreement, a value of 0 for total independence and a value of 1 for total agreement between two variables.<ul><li><em>Tau a</em>: only defined if no ties are present. In that case, the value for <span class='latex-formula' data-formula='$$\\tau_{A}$$'></span>, the statistic <span class='latex-formula' data-formula='$$z_{A}$$'></span> and the one- and two-sided probabilities for statistical independence under the assumption of a normally distributed null hypothesis are returned.</li><li><em>Tau b</em>: more robust than Tau a as it accounts for tied values. If no ties are present, its value and all subsequent measures will be equal to those of Tau a. Its value, the statistic <span class='latex-formula' data-formula='$$z_{B}$$'></span> and the one- and two-sided probabilities for statistical independence under the assumption of a normally distributed null hypothesis are returned.</li><li><em>Tau c</em>: similar to Tau b but more suitable for rectangular cases as the former rarely reaches its extreme values.</li></ul>",
+				"usage": "var testData = &hellip; // same data as in the example for the goodmanKruskalsGamma() method\nvar testVars = &hellip; // same data as in the example for the goodmanKruskalsGamma() method\n\nvar stats = new Statistics(testData, testVars);\nvar kendall = stats.kendallsTau('satisfaction', 'affordability');",
+				"returns": "{\n\ta: {\n\t\ttauA: 0.68888&hellip;,\n\t\tz: 2.77272&hellip;\n\t\tpOneSided: 0.00278,\n\t\tpTwoSided: 0.00556\n\t},\n\tb: {\n\t\ttauB: 0.68888&hellip;,\n\t\tz: 2.77272&hellip;\n\t\tpOneSided: 0.00278,\n\t\tpTwoSided: 0.00556\n\t},\n\tc: {\n\t\ttauC: 1.24\n\t},\n\tmissings: 0\n}"
+			},
+			{
+				"title": "spearmansRho()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient"],
+				"parameters": [
+					{
+						"name": "firstColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "secondColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "adjustForTies",
+						"types": ["boolean"],
+						"required": false,
+						"default": false
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Computes Spearman&rsquo;s rank correlation coefficient (in short, Spearmans&rsquo;s rho) for two variables given by <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code>. It it similar to <a href='#correlationcoefficient'>Pearson&rsquo;s correlation coefficient</a>, however, it does not compare the values of the variables but their ranks. It assesses monotonic relationships between two variables and does not discern between linear and non-linear relationships whereas the correlation coefficient assesses only linear relationships. Therefore, Spearman&rsquo;s rho is a more general parameter and also suitable for variables on an ordinal scale. However, this method is flawed when many ties are present (e.g. non-unique values for either variable). Setting <code class='lang-js'>adjustForTies</code> to <code class='lang-js'>true</code> alleviates the problem. Spearman&rsquo;s rho is defined over a range of <span class='latex-formula' data-formula='$$[-1, 1]$$'></span>, with a value of -1 implying total disgreement, a value of 0 for total independence and a value of 1 for total agreement between two variables. Besides computing <code class='lang-js'>rho</code>, this method also returns statistics and p values both for the assumption of a normally distributed and a Student&rsquo;s t-distributed null hypothesis.",
+				"usage": "var testData = &hellip; // same data as in the example for the assignRanks() method \nvar testVars = &hellip; // same data as in the example for the assignRanks() method\nvar stats = new Statistics(testData, testVars);\nvar dependence = stats.spearmansRho('age', 'iq');",
+				"returns": "{\n\trho: -0.76969&hellip;\n\tsignificanceNormal: {\n\t\tpOneSided: 0.0044,\n\t\tpTwoSided: 0.0088,\n\t\tzScore: -2.62010&hellip;\n\t},\n\tsignificanceStudent: {\n\t\tdegreesOfFreedom: 8,\n\t\tpOneSided: 0.00461&hellip;,\n\t\tpTwoSided: 0.00922&hellip;\n\t\ttStatistic: -3.41008&hellip;\n\t},\n\tmissings: 0\n}"
+			}
+		]
+	},
+	{
+		"section": "Regression",
+		"file": "correlation.html",
+		"items": [
+			{
+				"title": "linearRegression()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Simple_linear_regression", "https://en.wikipedia.org/wiki/Linear_regression"],
+				"parameters": [
+					{
+						"name": "firstColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "secondColumn",
+						"types": ["string"],
+						"required": true
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "Performs simple linear regression on two variables given by <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code>. This method assumes that their correlation &mdash; if there is any &mdash; is linear and calculates several characterising measures:<ul><li><em>correlationCoefficient</em>: The empirical measure <span class='latex-formula' data-formula='$$r_{xy}$$'></span> corresponds to <a href='#correlationcoefficient'>Pearson&rsquo;s correlation coefficient</a>. It&rsquo;s distributed over the interval <span class='latex-formula' data-formula='$$[-1, 1]$$'></span>, with a value of -1 implying total negative linear correlation, a value of 0 for no linear correlation and a value of 1 for total positive linear correlation.</li><li><em>coefficientOfDetermination</em>: This measure, signified as <span class='latex-formula' data-formula='$$R^{2}$$'></span>, describes how much variance in the data can be explained by the computed regression model. It falls into the interval <span class='latex-formula' data-formula='$$[0, 1]$$'></span>, where a value of 0 implies no linear correlation and a value of 1 implies perfect linear correlation.</li><li><em>coefficientOfDeterminationCorrected</em>: The coefficient of determination tends to get larger with a larger amount of independent variables. In linear regression, this is rarely a problem, however the corrected coefficient yields a more conservative result than the standard measure.</li><li><em>regressionFirst</em> and <em>regressionSecond</em>: A regression model describes a regression line following the linear equation <span class='latex-formula' data-formula='$$y = \\beta_{1} + \\beta_{2}\\cdot x$$'></span> with regression coefficients <span class='latex-formula' data-formula='$$\\beta_{1}$$'></span> and <span class='latex-formula' data-formula='$$\\beta_{2}$$'></span>. As this linear equation assumes as mapping of the value <span class='latex-formula' data-formula='$$x$$'></span> onto <span class='latex-formula' data-formula='$$y$$'></span>, thus being directional (i.e. \"<span class='latex-formula' data-formula='$$y$$'></span> is dependent on <span class='latex-formula' data-formula='$$x$$'></span>\"), the opposite mapping of <span class='latex-formula' data-formula='$$y$$'></span> onto <span class='latex-formula' data-formula='$$x$$'></span> (i.e. \"<span class='latex-formula' data-formula='$$x$$'></span> is dependent on <span class='latex-formula' data-formula='$$y$$'></span>\") needs to be considered as well. This method will return values for <code class='lang-js'>beta1</code> and <code class='lang-js'>beta2</code> both for the case mapping of <code class='lang-js'>firstColumn</code> to <code class='lang-js'>secondColumn</code> as <code class='lang-js'>regressionFirst</code> and the opposite mapping as <code class='lang-js'>regressionSecond</code>.</li><li><em>phi</em>: Both regression lines given by <code class='lang-js'>regressionFirst</code> and <code class='lang-js'>regressionSecond</code> form an angle <span class='latex-formula' data-formula='$$\\varphi$$'></span> which is another measure for the regression system&rsquo;s correlation, with values for <code class='lang-js'>phi</code> closer to 0&deg; indicating a better correlation than values closer to 90&deg;.</li></ul>",
+				"usage": "var testData = [\n\t{ price: 2.00, sold: 0 },\n\t{ price: 1.90, sold: 2 },\n\t{ price: 1.80, sold: 1 },\n\t{ price: 1.70, sold: 2 },\n\t{ price: 1.60, sold: 3 },\n\t{ price: 1.50, sold: 6 },\n\t{ price: 1.40, sold: 4 },\n\t{ price: 1.30, sold: 9 },\n\t{ price: 1.20, sold: 8 },\n\t{ price: 1.10, sold: 10 },\n\t{ price: 1.00, sold: 14 }\n];\n\nvar testVars = {\n\tprice: 'metric',\n\tsold: 'metric'\n};\n\nvar stats = new Statistics(testData, testVars);\nvar regression = stats.linearRegression('price', 'sold'));",
+				"returns": "{\n\tcoefficientOfDetermination: 0.88990&hellip;,\n\tcoefficientOfDeterminationCorrected: 0.87767&hellip;,\n\tcorrelationCoefficient: -0.94334&hellip;,\n\tphi: 19.37826&hellip;,\n\tregressionFirst: {\n\t\tbeta1: 24.18181&hellip;\n\t\tbeta2: -12.54545&hellip;\n\t},\n\tregressionSecond: {\n\t\tbeta1: 1.88046&hellip;,\n\t\tbeta2: -0.07093&hellip;\n\t}\n}"
+			}
+		]
+	},
+	{
+		"section": "Statistical tests - nonparametric",
+		"file": "tests.html",
+		"items": [
+			{
+				"title": "barnardsTest()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Barnard%27s_test"],
+				"parameters": [
+					{
+						"name": "firstColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "secondColumn",
+						"types": ["string"],
+						"required": true
+					}
+				],
+				"content": "Computes Barnard&rsquo;s exact test for two nominal, dichotomous (i.e. no more than two manifestations) variables <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code>. Its result gives the exact probability that the particular observations in the given data can be made if the null hypothesis that both variables are independent from another holds true. It is a more powerful alternative to <a href='#fishersexacttest'>Fisher&rsquo;s exact test</a>, however it is computationally more resource demanding. For this reason, this method will return <code class='lang-js'>undefined</code> and log an error message if the total number observations exceeds the value for the setting <code class='lang-js'>maxBarnardsN</code> (default: 200) which <a href='../index.html#settings'>can be changed upon initialisation</a> of this library.<br><br>This method returns an object storing the Wald statistic <code class='lang-js'>wald</code>, the one- and two-tailed significance and the nuisance parameter <code class='lang-js'>nuisance</code> for which this significance is largest.",
+				"usage": "var testData = [\n\t{ gender: 'female', smoker: 'yes' },\n\t{ gender: 'female', smoker: 'yes' },\n\t{ gender: 'female', smoker: 'no' },\n\t{ gender: 'female', smoker: 'no' },\n\t{ gender: 'female', smoker: 'no' },\n\t{ gender: 'female', smoker: 'no' },\n\t{ gender: 'female', smoker: 'no' },\n\t{ gender: 'female', smoker: 'no' },\n\t{ gender: 'male', smoker: 'yes' },\n\t{ gender: 'male', smoker: 'yes' },\n\t{ gender: 'male', smoker: 'yes' },\n\t{ gender: 'male', smoker: 'yes' },\n\t{ gender: 'male', smoker: 'yes' },\n\t{ gender: 'male', smoker: 'yes' },\n\t{ gender: 'male', smoker: 'yes' },\n\t{ gender: 'male', smoker: 'no' },\n\t{ gender: 'male', smoker: 'no' }\n];\n\nvar testVars = {\n\tgender: {\n\t\tscale: 'nominal',\n\t\tvalueMap: ['male', 'female']\n\t},\n\tsmoker: {\n\t\tscale: 'nominal',\n\t\tvalueMap: ['yes', 'no']\n\t}\n};\n\nvar stats = new Statistics(testData, testVars);\nvar barnard = stats.barnardsTest('gender', 'smoker');",
+				"returns": "{\n\twald: -2.17608&hellip;,\n\tnuisance: 0.50001&hellip;,\n\tpOneTailed: 0.02452&hellip;,\n\tpTwoTailed: 0.04904&hellip;\n}"
+			},
+			{
+				"title": "binomialTest()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Binomial_test"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					},
+					{
+						"name": "valueToTest",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "alpha",
+						"types": ["integer", "float"],
+						"required": false,
+						"default": 0.5
+					}
+				],
+				"scales": ["nominal", "ordinal"],
+				"content": "Computes the binomial test for the values of a nominal, dichotomous (i.e. no more than two manifestations) variable <code class='lang-js'>data</code> that can be either the name of a column (string) or an array of values. Its result is the probability that the observation of the values of <code class='lang-js'>data</code> could be made if the event <code class='lang-js'>valueToTest</code> is assumed to happen with a chance of <code class='lang-js'>alpha</code>. This method returns the test result for exactly, fewer (or exactly), and more (or exactly) as many events <code class='lang-js'>valueToTest</code> can be observed.",
+				"usage": "// results of a medical procedure - probability to survive: 80%\n// how likely is it that only 5/12 patients survived?\nvar testData = [\n\t{ survival: 'no' },\n\t{ survival: 'no' },\n\t{ survival: 'no' },\n\t{ survival: 'no' },\n\t{ survival: 'no' },\n\t{ survival: 'no' },\n\t{ survival: 'no' },\n\t{ survival: 'yes' },\n\t{ survival: 'yes' },\n\t{ survival: 'yes' },\n\t{ survival: 'yes' },\n\t{ survival: 'yes' }\n];\n\nvar testVars = { survival: { scale: 'nominal', valueMap: ['no', 'yes'] }};\n\nvar stats = new Statistics(testData, testVars);\nvar binomial = stats.binomialTest('survival', 'yes', 0.8);",
+				"returns": "{\n\tpExactly: 0.00332&hellip;,\n\tpFewer: 0.00058&hellip;,\n\tpAtMost: 0.00390&hellip;,\n\tpMore: 0.99609&hellip;,\n\tpAtLeast: 0.99941&hellip;\n}"
+			},
+			{
+				"title": "chiSquaredTest()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Chi-squared_test"],
+				"parameters": [
+					{
+						"name": "firstColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "secondColumn",
+						"types": ["string"],
+						"required": true
+					}
+				],
+				"scales": ["nominal", "ordinal"],
+				"content": "Computes the Chi-squared test for two ordinal or nominal variables <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code>. Its result gives the exact probability that the particular observations in the given data can be made if the null hypothesis that both variables are independent from another holds true.",
+				"usage": "var testData = [\n\t{ gender: 'male', voting: 'republican' }, &hellip;, // 140 times\n\t{ gender: 'male', voting: 'democrat' }, &hellip;, // 150 times\n\t{ gender: 'male', voting: 'independent' }, &hellip;, // 50 times\n\t{ gender: 'female', voting: 'republican' }, &hellip;, // 90 times\n\t{ gender: 'female', voting: 'democrat' }, &hellip;, // 150 times\n\t{ gender: 'female', voting: 'independent' }, &hellip; // 50 times\n];\n\nvar testVars = {\n\tgender: {\n\t\tscale: 'nominal',\n\t\tvalueMap: ['male', 'female']\n\t},\n\tvoting: {\n\t\tscale: 'nominal',\n\t\tvalueMap: ['republican', 'democrat', 'independent']\n\t}\n};\n\nvar stats = new Statistics(testData, testVars);\nvar chiSquared = stats.chiSquaredTest('gender', 'voting');",
+				"returns": "{\n\tPearsonChiSquared: 6.94505&hellip;,\n\tdegreesOfFreedom: 2,\n\tsignificance: 0.03103&hellip;\n}"
+			},
+			{
+				"title": "fishersExactTest()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Fisher%27s_exact_test"],
+				"parameters": [
+					{
+						"name": "firstColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "secondColumn",
+						"types": ["string"],
+						"required": true
+					}
+				],
+				"scales": ["nominal", "ordinal"],
+				"content": "Computes Fisher&rsquo;s exact test for two nominal, dichotomous (i.e. no more than two manifestations) variables <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code>. Its result gives the exact probability that the particular observations in the given data can be made if the null hypothesis that both variables are independent from another holds true. In the example given below, it means that if men and women were equally likely to be smokers there is about 4.9% chance that the supplied observations stated in <code class='lang-js'>testData</code> can be made. If the level of significance (expressed as the p value) was agreed to be larger than this value, then the data suggest that this hypothesis of equally likelihood to be a smoker should be rejected.",
+				"usage": "var testData = [\n\t{ gender: 'male', smoker: false },\n\t{ gender: 'male', smoker: true },\n\t{ gender: 'female', smoker: false },\n\t{ gender: 'male', smoker: true },\n\t{ gender: 'female', smoker: false },\n\t{ gender: 'female', smoker: false },\n\t{ gender: 'male', smoker: false },\n\t{ gender: 'male', smoker: true },\n\t{ gender: 'female', smoker: false },\n\t{ gender: 'female', smoker: false },\n\t{ gender: 'male', smoker: true },\n\t{ gender: 'male', smoker: true },\n\t{ gender: 'female', smoker: false },\n\t{ gender: 'female', smoker: true }\n];\n\nvar testVars = {\n\t gender: {\n\t\tscale: 'nominal',\n\t\tvalueMap: ['male', 'female']\n\t},\n\tsmoker: {\n\t\tscale: 'nominal',\n\t\tvalueMap: [true, false]\n\t}\n};\n\nvar stats = new Statistics(testData, testVars);\nvar fishersExactTest = stats.fishersExactTest('gender', 'smoker');",
+				"returns": "0.04895&hellip;"
+			},
+			{
+				"title": "mannWhitneyU()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test"],
+				"parameters": [
+					{
+						"name": "independentColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "dependentColumn",
+						"types": ["string"],
+						"required": true
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Performs the Mann-Whitney U test on the values of <code class='lang-js'>dependentColumn</code> assigned to the two groups given by the variable <code class='lang-js'>independentColumn</code>. It tests the null hypothesis that it is equally likely that a randomly selected sample from one group is less or greater than another from the other group. This test compares the rank sums of the observed data and computes a statistic that is normally distributed, however does not require the assumption of a normally distributed variable. This method returns the Mann-Whitney U along with its associated z-score and both p-values for one- and two-sided null hypotheses.",
+				"usage": "var testData = [\n\t{ gender: 'male', income: 2150 },\n\t{ gender: 'female', income: 1800 },\n\t{ gender: 'male', income: 2300 },\n\t{ gender: 'female', income: 1600 },\n\t{ gender: 'female', income: 1700 },\n\t{ gender: 'male', income: 2000 },\n\t{ gender: 'female', income: 1850 },\n\t{ gender: 'female', income: 2200 },\n\t{ gender: 'female', income: 1750 },\n\t{ gender: 'male', income: 2050 },\n];\n\nvar testVars = {\n\tgender: 'nominal',\n\tincome: 'metric'\n}\n\nvar stats = new Statistics(testData, testVars);\nvar u = stats.mannWhitneyU('gender', 'income'));",
+				"returns": "{\n\tMannWhitneyU: 3,\n\tzScore: -1.91880&hellip;,\n\tpOneTailed: 0.02749&hellip;,\n\tpTwoTailed: 0.05499&hellip;\n}"
+			},
+			{
+				"title": "signTest()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Sign_test"],
+				"parameters": [
+					{
+						"name": "firstColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "secondColumn",
+						"types": ["string"],
+						"required": true
+					}
+				],
+				"scales": ["ordinal", "interval", "metric"],
+				"content": "Computes the sign test for two variables <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code> by comparing the values in pairs of observations and counting the amount of pairs where the value for <code class='lang-js'>firstColumn</code> is larger than that for <code class='lang-js'>secondColumn</code>, returned as <code class='lang-js'>positives</code>. The order of these variables is therefore important, i.e. all calculated significance parameters should be interpreted in regard to the number of <code class='lang-js'>positives</code> under the assumption that the null hypothesis of equally likelihood that any pair can yield a negative or a positive difference.",
+				"usage": "var testData = [\n\t{ beforeDiet: 80, afterDiet: 83 },\n\t{ beforeDiet: 78, afterDiet: 82 },\n\t{ beforeDiet: 92, afterDiet: 94 },\n\t{ beforeDiet: 76, afterDiet: 64 },\n\t{ beforeDiet: 94, afterDiet: 96 },\n\t{ beforeDiet: 93, afterDiet: 97 },\n\t{ beforeDiet: 82, afterDiet: 83 },\n\t{ beforeDiet: 104, afterDiet: 87 },\n\t{ beforeDiet: 74, afterDiet: 77 },\n\t{ beforeDiet: 84, afterDiet: 85 }\n];\n\nvar testVars = {\n\tbeforeDiet: 'metric',\n\tafterDiet: 'metric'\n};\n\nvar stats = new Statistics(testData, testVars);\nvar sign = stats.signTest('beforeDiet', 'afterDiet');",
+				"returns": "{\n\tpositives: 2,\n\tpExactly: 0.04394&hellip;,\n\tpFewer: 0.01074&hellip;,\n\tpAtMost: 0.05468&hellip;,\n\tpMore: 0.94531&hellip;,\n\tpAtLeast: 0.98925&hellip;\n}"
+			}
+		]
+	},
+	{
+		"section": "Statistical tests - parametric",
+		"file": "tests.html",
+		"items": [
+			{
+				"title": "studentsTTestOneSample()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Student%27s_t-test"],
+				"parameters": [
+					{
+						"name": "column",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "nullHypothesisMean",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "Computes Student&rsquo;s one sample t-test for the values of a variable given by <code class='lang-js'>column</code>. It examines if the <a href='measures.html#artihmeticmean'>arithmetic mean</a> of a sample <code class='lang-js'>column</code> is equal to the predefined or suspected arithmetic mean <code class='lang-js'>nullHypothesisMean</code>. This method returns the associated t-statistic, the degrees of freedom and both one- and two-sided probabilities that the given observation can be made if the null hypothesis of equal arithmetic means is to hold true.",
+				"usage": "var batchMeasurements = [\n\t{ weight: 185 },\n\t{ weight: 201 },\n\t{ weight: 193 },\n\t{ weight: 184 },\n\t{ weight: 180 },\n\t{ weight: 176 },\n\t{ weight: 193 },\n\t{ weight: 182 },\n\t{ weight: 197 },\n\t{ weight: 204 }\n];\n\nvar stats = new Statistics(batchMeasurements, { weight: 'metric' });\nvar oneSample = stats.studentsTTestOneSample('weight', 200));",
+				"returns": "{\n\ttStatistic: -3.51631&hellip;,\n\tdegreesOfFreedom: 9,\n\tpOneSided: 0.00327&hellip;,\n\tpTwoSided: 0.00655&hellip;\n}"
+			},
+			{
+				"title": "studentsTTestTwoSamples()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Student%27s_t-test#Independent_two-sample_t-test", "https://en.wikipedia.org/wiki/Student%27s_t-test#Dependent_t-test_for_paired_samples"],
+				"parameters": [
+					{
+						"name": "firstColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"name": "secondColumn",
+						"types": ["string"],
+						"required": true
+					},
+					{
+						"options": [
+							{
+								"name": "nullHypothesisDifference",
+								"types": ["integer", "float"],
+								"required": false,
+								"default": 0
+							},
+							{
+								"name": "dependent",
+								"types": ["boolean"],
+								"required": false,
+								"default": false
+							}
+						]
+					}
+				],
+				"scales": ["interval", "metric"],
+				"content": "Computes Student&rsquo;s two sample t-test for the values of two variables given by <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code>. It examines if the <a href='measures.html#artihmeticmean'>arithmetic means</a> of these samples are equal to each other or, in general, that their difference is equal to <code class='lang-js'>nullHypothesisDifference</code> (default is <code class='lang-js'>0</code>). This test distinguishes between dependent and independent samples as controlled by <code class='lang-js'>dependent</code>. A dependent sample is characterised by repeated measures (e.g. samples on the same subjects before and after a an intervention) or when two samples have been paired (e.g. cases and controls in a study). This method returns the associated t-statistic, the degrees of freedom and both one- and two-sided probabilities that the given observation can be made if the null hypothesis of equal arithmetic means/a given difference <code class='lang-js'>nullHypothesisDifference</code> of their arithmetic means is to hold true. If <code class='lang-js'>dependent</code> is set to <code class='lang-js'>true</code>, missing values will be discarded and their amount will also be returned.",
+				"usage": "var treatmentResults = [\n\t{ before: 204, after: 189 },\n\t{ before: 212, after: 199 },\n\t{ before: 199, after: 191 },\n\t{ before: 209, after: 182 },\n\t{ before: 191, after: 176 },\n\t{ before: 190, after: 180 },\n\t{ before: 223, after: 220 },\n\t{ before: 185, after: 182 },\n\t{ before: 206, after: 194 },\n\t{ before: 212, after: 216 }\n];\n\nvar testVars = { before: 'metric', after: 'metric'  };\nvar stats = new Statistics(treatmentResults, testVars);\nvar treatmentSuccess = stats.studentsTTestTwoSamples('before', 'after', { dependent: true }));",
+				"returns": "{\n\ttStatistic: 3.79663&hellip;,\n\tdegreesOfFreedom: 9,\n\tmissings: 0,\n\tpOneSided: 0.00211&hellip;,\n\tpTwoSided: 0.00423&hellip;\n}"
+			}
+		]
+	},
+	{
+		"section": "Error analysis",
+		"file": "error.html",
+		"items": [
+			{
+				"title": "gaussianError()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Error_function"],
+				"parameters": [
+					{
+						"name": "x",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$${\\displaystyle {\\operatorname {erf} (x)={\\frac {1}{\\sqrt {\\pi }}}\\int _{-x}^{x}e^{-t^{2}}}}$$"
+					}
+				],
+				"content": "Computes the Gaussian error <span class='latex-formula' data-formula='$$\\displaystyle \\operatorname {erf(x)}$$'></span> for a given value <span class='latex-formula' data-formula='$$x$$'></span>. It is useful to calculate the probability of a normally distributed, random variable <span class='latex-formula' data-formula='$$X$$'></span> with mean 0 and variance <span class='latex-formula' data-formula='$$\\frac{1}{2}$$'></span> of falling into the range <span class='latex-formula' data-formula='$$[-x, x]$$'></span>.",
+				"usage": "var gaussianError = stats.gaussianError(0.45);",
+				"returns": "0.475481&hellip;"
+			},
+			{
+				"title": "inverseGaussianError()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Error_function#Inverse_functions", "https://people.maths.ox.ac.uk/gilesm/files/gems_erfinv.pdf"],
+				"parameters": [
+					{
+						"name": "x",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$${\\displaystyle \\operatorname {erf}^{-1}(x)=\\sum _{k=0}^{\\infty }{\\frac {c_{k}}{2k+1}}\\left({\\frac {\\sqrt {\\pi }}{2}}x\\right)^{2k+1},}$$"
+					},
+					{
+						"title": "with",
+						"formula": "$$c_{k}=\\sum _{m=0}^{k-1}{\\frac {c_{m}c_{k-1-m}}{(m+1)(2m+1)}}$$"
+					}
+				],
+				"content": "Computes the inverse Gaussian error <span class='latex-formula' data-formula='$${\\displaystyle \\operatorname {erf}^{-1}(x)}$$'></span> for a given value <span class='latex-formula' data-formula='$$x$$'></span> within the range of <span class='latex-formula' data-formula='$$[-1, 1]$$'></span>, such as <span class='latex-formula' data-formula='$${\\displaystyle \\operatorname {erf}(\\displaystyle \\operatorname {erf}^{-1}(x)) = \\displaystyle \\operatorname {erf}^{-1}(\\displaystyle \\operatorname {erf}(x))}$$'></span> (<a href='#gaussianerror'>see above</a>). This method uses Mike Giles&rsquo; approximation in its single precision implementation.",
+				"usage": "var inverseError = stats.inverseGaussianError(0.475481);",
+				"returns": "0.4499992"
+			},
+			{
+				"title": "probit()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Probit"],
+				"parameters": [
+					{
+						"name": "quantile",
+						"types": ["integer", "float"],
+						"required": true
+					}
+				],
+				"formulas": [
+					{
+						"formula": "$$\\operatorname {probit}(p)={\\sqrt {2}}\\,\\operatorname {erf}^{{-1}}(2p-1)$$"
+					}
+				],
+				"content": "Returns the probit for a given <code class='lang-js'>quantile</code>, which is defined as the inverse of the <a href='distributions.html#normalcumulativedistribution'>cumulative normal distribution function</a>. It describes the deviation from the mean for a given cumulative probability of a normal distributed variable, e.g. over how many standard deviations from the mean a given cumulative probability is spread.",
+				"usage": "var probit = stats.probit(0.975); // two-sided value for 95%",
+				"returns": "1.95996&hellip;\n// 95% of the values of a normally distributed variable lie within\n// the interval [-1.95996, 1.95996] of the standard normal distribution"
+			}
+		]
+	},
+	{
+		"section": "Random numbers and shuffle",
+		"file": "error.html",
+		"description": "statistics.js offers implementations of several simple pseudo-random number generators that can be used for shuffling or sampling data. Some can be seeded in order to generate deterministic numbers in case a replicable behaviour is needed. None of these generators are truly random or cryptographically secure. It is strongly advised to not use them for any security related applications and instead refer to more suitable algorithms outside of the scope of this library.",
+		"items": [
+			{
+				"title": "boxMuller()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform"],
+				"parameters": [
+					{
+						"name": "mean",
+						"types": ["integer", "float"],
+						"required": false,
+						"default": "0"
+					},
+					{
+						"name": "standardDeviation",
+						"types": ["integer", "float"],
+						"required": false,
+						"default": "1"
+					},
+					{
+						"options": [
+							{
+								"name": "randomSourceA",
+								"types": ["function"],
+								"default": "Math.random"
+							},
+							{
+								"name": "randomSourceB",
+								"types": ["function"],
+								"default": "Math.random"
+							}
+						]
+					}
+				],
+				"content": "Generates pseudo-random numbers from a normal distribution with <code class='language-js'>mean</code> and <code class='language-js'>standardDeviation</code>. Optionally, it can be seeded with two random number generators <code class='language-js'>randomSourceA()</code> and <code class='language-js'>randomSourceB()</code>. Both should return a random number from a uniform distribution in the interval <span class='latex-formula' data-formula='$$[0, 1]$$'></span> on each call. As a fallback, if these functions fail to produce such a number in less than 50 tries <code class='language-js'>Math.random()</code> will be used instead.",
+				"usage": "var xorshift = new stats.xorshift([100934093, 482920221, 592807725, 993051833]),\n\tseeds = { randomSourceA: xorshift.next, randomSourceB: xorshift.next },\n\tboxMuller = stats.boxMuller(12, 4, seeds);",
+				"returns": "10.62038&hellip;"
+			},
+			{
+				"title": "fisherYatesShuffle()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle"],
+				"parameters": [
+					{
+						"name": "data",
+						"types": ["string", "array"],
+						"required": true
+					},
+					{
+						"name": "randomSource",
+						"types": ["function"],
+						"required": false,
+						"default": "Math.random"
+					}
+				],
+				"content": "Shuffles the values in a dataset <code class='language-js'>data</code> that can be either the name of a column (string) or an array of values according to Durstenfeld&rsquo;s version. It returns a random permutation of the values as an <code class='lang-js'>array</code> based on a random number generator <code class='lang-js'>randomSource</code> that returns a float in the interval <span class='latex-formula' data-formula='$$[0, 1)$$'></span> on each call.",
+				"usage": "var fisherYatesShuffle = stats.fisherYatesShuffle([1, 3, 7, 4, 12, 4, 4, 7, 3, 6, 7, 1, 2]);",
+				"returns": "[6, 2, 1, 3, 4, 7, 4, 3, 7, 4, 12, 7, 1]"
+			},
+			{
+				"title": "xorshift()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Xorshift", "https://www.jstatsoft.org/article/view/v008i14"],
+				"parameters": [
+					{
+						"name": "seed",
+						"types": ["array"],
+						"required": true
+					},
+					{
+						"name": "startIndex",
+						"types": ["integer"],
+						"required": false,
+						"default": "0"
+					}
+				],
+				"content": "Generates pseudo-random numbers from a uniform distribution based on an array <code class='lang-js'>seed</code> of exactly four numeric seeds. None of these numbers should be zero to ensure a good randomisation. You may supply a <code class='lang-js'>startIndex</code> of <code class='lang-js'>n</code> to skip the first <code class='lang-js'>n</code> generated numbers and allow the generator to reach a better performance before any numbers are used. Numbers can be generated with the <code class='lang-js'>next(normalise = true)</code> method invoked on the new xorshift object, choosing between raw values and normalised values, i.e. mapped to the interval of <span class='latex-formula' data-formula='$$[0, 1]$$'></span>. This method is a variation of <a href='https://github.com/uupaa/Random.js' target='_blank' rel='noopener'>/u/uupaa&rsquo;s implementation</a>.",
+				"usage": "var xorshift = new stats.xorshift([100934093, 482920221, 592807725, 993051833]);\nvar random = xorshift.next(false);\nvar randomNormalised = xorshift.next(true);",
+				"returns": "random: 471695451\nrandomNormalised: 0.27623&hellip;"
+			},
+			{
+				"title": "ziggurat()",
+				"lastUpdated": "1.0",
+				"resources": ["https://en.wikipedia.org/wiki/Ziggurat_algorithm", "https://www.jstatsoft.org/article/view/v005i08"],
+				"parameters": [
+					{
+						"name": "mean",
+						"types": ["integer", "float"],
+						"required": false,
+						"default": "0"
+					},
+					{
+						"name": "standardDeviation",
+						"types": ["integer", "float"],
+						"required": false,
+						"default": "1"
+					}
+				],
+				"content": "Generates pseudo-random numbers from a normal distribution with <code class='language-js'>mean</code> and <code class='language-js'>standardDeviation</code>. It is similar to the <a href='#boxmuller'>Box-Muller generator</a>, however, it can not be initialised with a seeding source. Numbers can be generated with the <code class='lang-js'>next()</code> method invoked on the new ziggurat object. This implementation is a variation of <a href='https://www.filosophy.org/post/35/normaldistributed_random_values_in_javascript_using_the_ziggurat_algorithm/' target='_blank' rel='noopener'>Filip Zembowicz&rsquo; translation</a> of the original C code described in the original paper by Georg Marsaglia and Wai Wan Tsang (see link above).",
+				"usage": "var ziggurat = new stats.ziggurat(5, 1);\nvar random = ziggurat.next();",
+				"returns": "4.72130&hellip;"
+			}
+		]
+	}
+	]
+}

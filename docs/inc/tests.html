@@ -1,0 +1,208 @@
+<!DOCTYPE html><html lang="en" class="no-js"><head><meta charset="utf-8" /><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>statistics.js - Documentation</title><script>var html = document.getElementsByClassName("no-js"); for (var i = 0; i < html.length; i++) { html[i].className = "js"; } </script><link href="style.css" rel="stylesheet" /><link href="https://fonts.googleapis.com/css?family=Nunito:300,400|Source+Sans+Pro:400,400i,600" rel="stylesheet"><script src="script.js"></script></head><body><div class="wrapper"><div class="header"><div class="header-inner"><div class="title-line"><h1 class="title gamma"><a href="../index.html">statistics.js</a></h1><h2 class="subtitle zeta af">Documentation</h2></div><div class="header-menu"><ul><li>v1.0</li><li class="uc"><a href="https://github.com/thisancog/simplestatistics.js" target="_blank" rel="noopener">Github</a></li><li><a href="https://raw.githubusercontent.com/thisancog/simplestatistics.js/master/simplestatistics.min.js" target="_blank" rel="noopener" download><span class="uc">Download</span> (minified)</a></li></ul></div></div></div><div class="main"><div class="sidebar"><div class="sidebar-intro"><h3>Table of contents</h3><div class="sidebar-desc">statistics.js is a lightweight library to provide all basic and many advanced utilities commonly used in statistical data analysis. It is free to use, open source and open for contributions.</div></div><div class="sidebar-sections"><div class="section section-nocontent"><h5><a href="../index.html">Introduction</a></h5></div><div class="section section-nocontent"><h5><a href="core.html">Core methods</a></h5></div><div class="section section-nocontent"><h5><a href="algebra.html">Algebra</a></h5></div><div class="section section-nocontent"><h5><a href="measures.html">Measures of central tendency</a></h5></div><div class="section section-nocontent"><h5><a href="measures.html#section-measuresofdispersion">Measures of dispersion</a></h5></div><div class="section section-nocontent"><h5><a href="measures.html#section-measuresofshape">Measures of shape</a></h5></div><div class="section section-nocontent"><h5><a href="distributions.html">Distributions</a></h5></div><div class="section section-nocontent"><h5><a href="correlation.html">Correlation</a></h5></div><div class="section section-nocontent"><h5><a href="correlation.html#section-regression">Regression</a></h5></div><div class="section"><h5><a href="#section-statisticaltests-nonparametric">Statistical tests - nonparametric</a></h5><ul class="menu"><li class="""><a href="#barnardstest">barnardsTest()</a></li><li class="""><a href="#binomialtest">binomialTest()</a></li><li class="""><a href="#chisquaredtest">chiSquaredTest()</a></li><li class="""><a href="#fishersexacttest">fishersExactTest()</a></li><li class="""><a href="#mannwhitneyu">mannWhitneyU()</a></li><li class="""><a href="#signtest">signTest()</a></li></ul></div><div class="section"><h5><a href="#section-statisticaltests-parametric">Statistical tests - parametric</a></h5><ul class="menu"><li class="""><a href="#studentsttestonesample">studentsTTestOneSample()</a></li><li class="""><a href="#studentsttesttwosamples">studentsTTestTwoSamples()</a></li></ul></div><div class="section section-nocontent"><h5><a href="error.html">Error analysis</a></h5></div><div class="section section-nocontent"><h5><a href="error.html#section-randomnumbersandshuffle">Random numbers and shuffle</a></h5></div></div></div><div class="content"><div class="section"><div class="section-title"><h3 class="af"><a id="section-statisticaltests-nonparametric">Statistical tests - nonparametric</a></h3></div><div class="section-entries"><div class="single-entry"><div class="single-entry-header"><div class="single-entry-title"><h4 class="af"><a id="barnardstest">barnardsTest()</a></h4></div><div class="single-entry-meta"><div class="single-entry-link"><a href="#barnardstest">#</a></div><div class="single-entry-resource tooltip"><a href="https://en.wikipedia.org/wiki/Barnard%27s_test" target="_blank" rel="noopener">More info</a><span>Read more at wikipedia.org</span></div><div class="single-entry-last-updated tooltip">1.0<span>Last updated in version 1.0</span></div></div></div><div class="single-entry-body">Computes Barnard&rsquo;s exact test for two nominal, dichotomous (i.e. no more than two manifestations) variables <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code>. Its result gives the exact probability that the particular observations in the given data can be made if the null hypothesis that both variables are independent from another holds true. It is a more powerful alternative to <a href='#fishersexacttest'>Fisher&rsquo;s exact test</a>, however it is computationally more resource demanding. For this reason, this method will return <code class='lang-js'>undefined</code> and log an error message if the total number observations exceeds the value for the setting <code class='lang-js'>maxBarnardsN</code> (default: 200) which <a href='../index.html#settings'>can be changed upon initialisation</a> of this library.<br><br>This method returns an object storing the Wald statistic <code class='lang-js'>wald</code>, the one- and two-tailed significance and the nuisance parameter <code class='lang-js'>nuisance</code> for which this significance is largest.</div><div class="single-entry-parameters"><h5>Parameters:</h5><div class="single-param">(<span class="param-type token string">string</span>) <span class="param-name">firstColumn</span> (<span class="param-required">required</span>)</div><div class="single-param">(<span class="param-type token string">string</span>) <span class="param-name">secondColumn</span> (<span class="param-required">required</span>)</div></div><div class="single-entry-usage"><h5>Usage:</h5><pre class="lang-js"><code>var testData = [
+	{ gender: 'female', smoker: 'yes' },
+	{ gender: 'female', smoker: 'yes' },
+	{ gender: 'female', smoker: 'no' },
+	{ gender: 'female', smoker: 'no' },
+	{ gender: 'female', smoker: 'no' },
+	{ gender: 'female', smoker: 'no' },
+	{ gender: 'female', smoker: 'no' },
+	{ gender: 'female', smoker: 'no' },
+	{ gender: 'male', smoker: 'yes' },
+	{ gender: 'male', smoker: 'yes' },
+	{ gender: 'male', smoker: 'yes' },
+	{ gender: 'male', smoker: 'yes' },
+	{ gender: 'male', smoker: 'yes' },
+	{ gender: 'male', smoker: 'yes' },
+	{ gender: 'male', smoker: 'yes' },
+	{ gender: 'male', smoker: 'no' },
+	{ gender: 'male', smoker: 'no' }
+];
+
+var testVars = {
+	gender: {
+		scale: 'nominal',
+		valueMap: ['male', 'female']
+	},
+	smoker: {
+		scale: 'nominal',
+		valueMap: ['yes', 'no']
+	}
+};
+
+var stats = new Statistics(testData, testVars);
+var barnard = stats.barnardsTest('gender', 'smoker');</code></pre></div><div class="single-entry-returns"><h5>Returns:</h5><pre class="lang-js"><code>{
+	wald: -2.17608&hellip;,
+	nuisance: 0.50001&hellip;,
+	pOneTailed: 0.02452&hellip;,
+	pTwoTailed: 0.04904&hellip;
+}</code></pre></div></div><div class="single-entry"><div class="single-entry-header"><div class="single-entry-title"><h4 class="af"><a id="binomialtest">binomialTest()</a></h4></div><div class="single-entry-meta"><div class="single-entry-link"><a href="#binomialtest">#</a></div><div class="single-entry-resource tooltip"><a href="https://en.wikipedia.org/wiki/Binomial_test" target="_blank" rel="noopener">More info</a><span>Read more at wikipedia.org</span></div><div class="single-entry-last-updated tooltip">1.0<span>Last updated in version 1.0</span></div></div></div><div class="single-entry-body">Computes the binomial test for the values of a nominal, dichotomous (i.e. no more than two manifestations) variable <code class='lang-js'>data</code> that can be either the name of a column (string) or an array of values. Its result is the probability that the observation of the values of <code class='lang-js'>data</code> could be made if the event <code class='lang-js'>valueToTest</code> is assumed to happen with a chance of <code class='lang-js'>alpha</code>. This method returns the test result for exactly, fewer (or exactly), and more (or exactly) as many events <code class='lang-js'>valueToTest</code> can be observed.</div><div class="single-entry-parameters"><h5>Parameters:</h5><div class="single-param">(<span class="param-type token string">string</span> or <span class="param-type token string">array</span>) <span class="param-name">data</span> (<span class="param-required">required</span>)</div><div class="single-param">(<span class="param-type token string">string</span>) <span class="param-name">valueToTest</span> (<span class="param-required">required</span>)</div><div class="single-param">(<span class="param-type token number">integer</span> or <span class="param-type token number">float</span>) <span class="param-name">alpha</span> (<span class="param-required">optional</span>, <span class="param-default">default: <span class="param-default-value token number">0.5</span></span>)</div></div><div class="single-entry-scales"><h5>Scales of measure:</h5><a href="../index.html#scalesofmeasure">nominal, ordinal</a></div><div class="single-entry-usage"><h5>Usage:</h5><pre class="lang-js"><code>// results of a medical procedure - probability to survive: 80%
+// how likely is it that only 5/12 patients survived?
+var testData = [
+	{ survival: 'no' },
+	{ survival: 'no' },
+	{ survival: 'no' },
+	{ survival: 'no' },
+	{ survival: 'no' },
+	{ survival: 'no' },
+	{ survival: 'no' },
+	{ survival: 'yes' },
+	{ survival: 'yes' },
+	{ survival: 'yes' },
+	{ survival: 'yes' },
+	{ survival: 'yes' }
+];
+
+var testVars = { survival: { scale: 'nominal', valueMap: ['no', 'yes'] }};
+
+var stats = new Statistics(testData, testVars);
+var binomial = stats.binomialTest('survival', 'yes', 0.8);</code></pre></div><div class="single-entry-returns"><h5>Returns:</h5><pre class="lang-js"><code>{
+	pExactly: 0.00332&hellip;,
+	pFewer: 0.00058&hellip;,
+	pAtMost: 0.00390&hellip;,
+	pMore: 0.99609&hellip;,
+	pAtLeast: 0.99941&hellip;
+}</code></pre></div></div><div class="single-entry"><div class="single-entry-header"><div class="single-entry-title"><h4 class="af"><a id="chisquaredtest">chiSquaredTest()</a></h4></div><div class="single-entry-meta"><div class="single-entry-link"><a href="#chisquaredtest">#</a></div><div class="single-entry-resource tooltip"><a href="https://en.wikipedia.org/wiki/Chi-squared_test" target="_blank" rel="noopener">More info</a><span>Read more at wikipedia.org</span></div><div class="single-entry-last-updated tooltip">1.0<span>Last updated in version 1.0</span></div></div></div><div class="single-entry-body">Computes the Chi-squared test for two ordinal or nominal variables <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code>. Its result gives the exact probability that the particular observations in the given data can be made if the null hypothesis that both variables are independent from another holds true.</div><div class="single-entry-parameters"><h5>Parameters:</h5><div class="single-param">(<span class="param-type token string">string</span>) <span class="param-name">firstColumn</span> (<span class="param-required">required</span>)</div><div class="single-param">(<span class="param-type token string">string</span>) <span class="param-name">secondColumn</span> (<span class="param-required">required</span>)</div></div><div class="single-entry-scales"><h5>Scales of measure:</h5><a href="../index.html#scalesofmeasure">nominal, ordinal</a></div><div class="single-entry-usage"><h5>Usage:</h5><pre class="lang-js"><code>var testData = [
+	{ gender: 'male', voting: 'republican' }, &hellip;, // 140 times
+	{ gender: 'male', voting: 'democrat' }, &hellip;, // 150 times
+	{ gender: 'male', voting: 'independent' }, &hellip;, // 50 times
+	{ gender: 'female', voting: 'republican' }, &hellip;, // 90 times
+	{ gender: 'female', voting: 'democrat' }, &hellip;, // 150 times
+	{ gender: 'female', voting: 'independent' }, &hellip; // 50 times
+];
+
+var testVars = {
+	gender: {
+		scale: 'nominal',
+		valueMap: ['male', 'female']
+	},
+	voting: {
+		scale: 'nominal',
+		valueMap: ['republican', 'democrat', 'independent']
+	}
+};
+
+var stats = new Statistics(testData, testVars);
+var chiSquared = stats.chiSquaredTest('gender', 'voting');</code></pre></div><div class="single-entry-returns"><h5>Returns:</h5><pre class="lang-js"><code>{
+	PearsonChiSquared: 6.94505&hellip;,
+	degreesOfFreedom: 2,
+	significance: 0.03103&hellip;
+}</code></pre></div></div><div class="single-entry"><div class="single-entry-header"><div class="single-entry-title"><h4 class="af"><a id="fishersexacttest">fishersExactTest()</a></h4></div><div class="single-entry-meta"><div class="single-entry-link"><a href="#fishersexacttest">#</a></div><div class="single-entry-resource tooltip"><a href="https://en.wikipedia.org/wiki/Fisher%27s_exact_test" target="_blank" rel="noopener">More info</a><span>Read more at wikipedia.org</span></div><div class="single-entry-last-updated tooltip">1.0<span>Last updated in version 1.0</span></div></div></div><div class="single-entry-body">Computes Fisher&rsquo;s exact test for two nominal, dichotomous (i.e. no more than two manifestations) variables <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code>. Its result gives the exact probability that the particular observations in the given data can be made if the null hypothesis that both variables are independent from another holds true. In the example given below, it means that if men and women were equally likely to be smokers there is about 4.9% chance that the supplied observations stated in <code class='lang-js'>testData</code> can be made. If the level of significance (expressed as the p value) was agreed to be larger than this value, then the data suggest that this hypothesis of equally likelihood to be a smoker should be rejected.</div><div class="single-entry-parameters"><h5>Parameters:</h5><div class="single-param">(<span class="param-type token string">string</span>) <span class="param-name">firstColumn</span> (<span class="param-required">required</span>)</div><div class="single-param">(<span class="param-type token string">string</span>) <span class="param-name">secondColumn</span> (<span class="param-required">required</span>)</div></div><div class="single-entry-scales"><h5>Scales of measure:</h5><a href="../index.html#scalesofmeasure">nominal, ordinal</a></div><div class="single-entry-usage"><h5>Usage:</h5><pre class="lang-js"><code>var testData = [
+	{ gender: 'male', smoker: false },
+	{ gender: 'male', smoker: true },
+	{ gender: 'female', smoker: false },
+	{ gender: 'male', smoker: true },
+	{ gender: 'female', smoker: false },
+	{ gender: 'female', smoker: false },
+	{ gender: 'male', smoker: false },
+	{ gender: 'male', smoker: true },
+	{ gender: 'female', smoker: false },
+	{ gender: 'female', smoker: false },
+	{ gender: 'male', smoker: true },
+	{ gender: 'male', smoker: true },
+	{ gender: 'female', smoker: false },
+	{ gender: 'female', smoker: true }
+];
+
+var testVars = {
+	 gender: {
+		scale: 'nominal',
+		valueMap: ['male', 'female']
+	},
+	smoker: {
+		scale: 'nominal',
+		valueMap: [true, false]
+	}
+};
+
+var stats = new Statistics(testData, testVars);
+var fishersExactTest = stats.fishersExactTest('gender', 'smoker');</code></pre></div><div class="single-entry-returns"><h5>Returns:</h5><pre class="lang-js"><code>0.04895&hellip;</code></pre></div></div><div class="single-entry"><div class="single-entry-header"><div class="single-entry-title"><h4 class="af"><a id="mannwhitneyu">mannWhitneyU()</a></h4></div><div class="single-entry-meta"><div class="single-entry-link"><a href="#mannwhitneyu">#</a></div><div class="single-entry-resource tooltip"><a href="https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test" target="_blank" rel="noopener">More info</a><span>Read more at wikipedia.org</span></div><div class="single-entry-last-updated tooltip">1.0<span>Last updated in version 1.0</span></div></div></div><div class="single-entry-body">Performs the Mann-Whitney U test on the values of <code class='lang-js'>dependentColumn</code> assigned to the two groups given by the variable <code class='lang-js'>independentColumn</code>. It tests the null hypothesis that it is equally likely that a randomly selected sample from one group is less or greater than another from the other group. This test compares the rank sums of the observed data and computes a statistic that is normally distributed, however does not require the assumption of a normally distributed variable. This method returns the Mann-Whitney U along with its associated z-score and both p-values for one- and two-sided null hypotheses.</div><div class="single-entry-parameters"><h5>Parameters:</h5><div class="single-param">(<span class="param-type token string">string</span>) <span class="param-name">independentColumn</span> (<span class="param-required">required</span>)</div><div class="single-param">(<span class="param-type token string">string</span>) <span class="param-name">dependentColumn</span> (<span class="param-required">required</span>)</div></div><div class="single-entry-scales"><h5>Scales of measure:</h5><a href="../index.html#scalesofmeasure">ordinal, interval, metric</a></div><div class="single-entry-usage"><h5>Usage:</h5><pre class="lang-js"><code>var testData = [
+	{ gender: 'male', income: 2150 },
+	{ gender: 'female', income: 1800 },
+	{ gender: 'male', income: 2300 },
+	{ gender: 'female', income: 1600 },
+	{ gender: 'female', income: 1700 },
+	{ gender: 'male', income: 2000 },
+	{ gender: 'female', income: 1850 },
+	{ gender: 'female', income: 2200 },
+	{ gender: 'female', income: 1750 },
+	{ gender: 'male', income: 2050 },
+];
+
+var testVars = {
+	gender: 'nominal',
+	income: 'metric'
+}
+
+var stats = new Statistics(testData, testVars);
+var u = stats.mannWhitneyU('gender', 'income'));</code></pre></div><div class="single-entry-returns"><h5>Returns:</h5><pre class="lang-js"><code>{
+	MannWhitneyU: 3,
+	zScore: -1.91880&hellip;,
+	pOneTailed: 0.02749&hellip;,
+	pTwoTailed: 0.05499&hellip;
+}</code></pre></div></div><div class="single-entry"><div class="single-entry-header"><div class="single-entry-title"><h4 class="af"><a id="signtest">signTest()</a></h4></div><div class="single-entry-meta"><div class="single-entry-link"><a href="#signtest">#</a></div><div class="single-entry-resource tooltip"><a href="https://en.wikipedia.org/wiki/Sign_test" target="_blank" rel="noopener">More info</a><span>Read more at wikipedia.org</span></div><div class="single-entry-last-updated tooltip">1.0<span>Last updated in version 1.0</span></div></div></div><div class="single-entry-body">Computes the sign test for two variables <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code> by comparing the values in pairs of observations and counting the amount of pairs where the value for <code class='lang-js'>firstColumn</code> is larger than that for <code class='lang-js'>secondColumn</code>, returned as <code class='lang-js'>positives</code>. The order of these variables is therefore important, i.e. all calculated significance parameters should be interpreted in regard to the number of <code class='lang-js'>positives</code> under the assumption that the null hypothesis of equally likelihood that any pair can yield a negative or a positive difference.</div><div class="single-entry-parameters"><h5>Parameters:</h5><div class="single-param">(<span class="param-type token string">string</span>) <span class="param-name">firstColumn</span> (<span class="param-required">required</span>)</div><div class="single-param">(<span class="param-type token string">string</span>) <span class="param-name">secondColumn</span> (<span class="param-required">required</span>)</div></div><div class="single-entry-scales"><h5>Scales of measure:</h5><a href="../index.html#scalesofmeasure">ordinal, interval, metric</a></div><div class="single-entry-usage"><h5>Usage:</h5><pre class="lang-js"><code>var testData = [
+	{ beforeDiet: 80, afterDiet: 83 },
+	{ beforeDiet: 78, afterDiet: 82 },
+	{ beforeDiet: 92, afterDiet: 94 },
+	{ beforeDiet: 76, afterDiet: 64 },
+	{ beforeDiet: 94, afterDiet: 96 },
+	{ beforeDiet: 93, afterDiet: 97 },
+	{ beforeDiet: 82, afterDiet: 83 },
+	{ beforeDiet: 104, afterDiet: 87 },
+	{ beforeDiet: 74, afterDiet: 77 },
+	{ beforeDiet: 84, afterDiet: 85 }
+];
+
+var testVars = {
+	beforeDiet: 'metric',
+	afterDiet: 'metric'
+};
+
+var stats = new Statistics(testData, testVars);
+var sign = stats.signTest('beforeDiet', 'afterDiet');</code></pre></div><div class="single-entry-returns"><h5>Returns:</h5><pre class="lang-js"><code>{
+	positives: 2,
+	pExactly: 0.04394&hellip;,
+	pFewer: 0.01074&hellip;,
+	pAtMost: 0.05468&hellip;,
+	pMore: 0.94531&hellip;,
+	pAtLeast: 0.98925&hellip;
+}</code></pre></div></div></div></div><div class="section"><div class="section-title"><h3 class="af"><a id="section-statisticaltests-parametric">Statistical tests - parametric</a></h3></div><div class="section-entries"><div class="single-entry"><div class="single-entry-header"><div class="single-entry-title"><h4 class="af"><a id="studentsttestonesample">studentsTTestOneSample()</a></h4></div><div class="single-entry-meta"><div class="single-entry-link"><a href="#studentsttestonesample">#</a></div><div class="single-entry-resource tooltip"><a href="https://en.wikipedia.org/wiki/Student%27s_t-test" target="_blank" rel="noopener">More info</a><span>Read more at wikipedia.org</span></div><div class="single-entry-last-updated tooltip">1.0<span>Last updated in version 1.0</span></div></div></div><div class="single-entry-body">Computes Student&rsquo;s one sample t-test for the values of a variable given by <code class='lang-js'>column</code>. It examines if the <a href='measures.html#artihmeticmean'>arithmetic mean</a> of a sample <code class='lang-js'>column</code> is equal to the predefined or suspected arithmetic mean <code class='lang-js'>nullHypothesisMean</code>. This method returns the associated t-statistic, the degrees of freedom and both one- and two-sided probabilities that the given observation can be made if the null hypothesis of equal arithmetic means is to hold true.</div><div class="single-entry-parameters"><h5>Parameters:</h5><div class="single-param">(<span class="param-type token string">string</span>) <span class="param-name">column</span> (<span class="param-required">required</span>)</div><div class="single-param">(<span class="param-type token number">integer</span> or <span class="param-type token number">float</span>) <span class="param-name">nullHypothesisMean</span> (<span class="param-required">required</span>)</div></div><div class="single-entry-scales"><h5>Scales of measure:</h5><a href="../index.html#scalesofmeasure">interval, metric</a></div><div class="single-entry-usage"><h5>Usage:</h5><pre class="lang-js"><code>var batchMeasurements = [
+	{ weight: 185 },
+	{ weight: 201 },
+	{ weight: 193 },
+	{ weight: 184 },
+	{ weight: 180 },
+	{ weight: 176 },
+	{ weight: 193 },
+	{ weight: 182 },
+	{ weight: 197 },
+	{ weight: 204 }
+];
+
+var stats = new Statistics(batchMeasurements, { weight: 'metric' });
+var oneSample = stats.studentsTTestOneSample('weight', 200));</code></pre></div><div class="single-entry-returns"><h5>Returns:</h5><pre class="lang-js"><code>{
+	tStatistic: -3.51631&hellip;,
+	degreesOfFreedom: 9,
+	pOneSided: 0.00327&hellip;,
+	pTwoSided: 0.00655&hellip;
+}</code></pre></div></div><div class="single-entry"><div class="single-entry-header"><div class="single-entry-title"><h4 class="af"><a id="studentsttesttwosamples">studentsTTestTwoSamples()</a></h4></div><div class="single-entry-meta"><div class="single-entry-link"><a href="#studentsttesttwosamples">#</a></div><div class="single-entry-resource tooltip"><a href="https://en.wikipedia.org/wiki/Student%27s_t-test#Independent_two-sample_t-test" target="_blank" rel="noopener">More info</a><span>Read more at wikipedia.org</span></div><div class="single-entry-resource tooltip"><a href="https://en.wikipedia.org/wiki/Student%27s_t-test#Dependent_t-test_for_paired_samples" target="_blank" rel="noopener">More info</a><span>Read more at wikipedia.org</span></div><div class="single-entry-last-updated tooltip">1.0<span>Last updated in version 1.0</span></div></div></div><div class="single-entry-body">Computes Student&rsquo;s two sample t-test for the values of two variables given by <code class='lang-js'>firstColumn</code> and <code class='lang-js'>secondColumn</code>. It examines if the <a href='measures.html#artihmeticmean'>arithmetic means</a> of these samples are equal to each other or, in general, that their difference is equal to <code class='lang-js'>nullHypothesisDifference</code> (default is <code class='lang-js'>0</code>). This test distinguishes between dependent and independent samples as controlled by <code class='lang-js'>dependent</code>. A dependent sample is characterised by repeated measures (e.g. samples on the same subjects before and after a an intervention) or when two samples have been paired (e.g. cases and controls in a study). This method returns the associated t-statistic, the degrees of freedom and both one- and two-sided probabilities that the given observation can be made if the null hypothesis of equal arithmetic means/a given difference <code class='lang-js'>nullHypothesisDifference</code> of their arithmetic means is to hold true. If <code class='lang-js'>dependent</code> is set to <code class='lang-js'>true</code>, missing values will be discarded and their amount will also be returned.</div><div class="single-entry-parameters"><h5>Parameters:</h5><div class="single-param">(<span class="param-type token string">string</span>) <span class="param-name">firstColumn</span> (<span class="param-required">required</span>)</div><div class="single-param">(<span class="param-type token string">string</span>) <span class="param-name">secondColumn</span> (<span class="param-required">required</span>)</div><div class="options-list"><h5>Options:</h5><div class="single-param">(<span class="param-type token number">integer</span> or <span class="param-type token number">float</span>) <span class="param-name">nullHypothesisDifference</span> (<span class="param-default">default: <span class="param-default-value token number">0</span></span>)</div><div class="single-param">(<span class="param-type token boolean">boolean</span>) <span class="param-name">dependent</span> (<span class="param-default">default: <span class="param-default-value token boolean">false</span></span>)</div></div></div><div class="single-entry-scales"><h5>Scales of measure:</h5><a href="../index.html#scalesofmeasure">interval, metric</a></div><div class="single-entry-usage"><h5>Usage:</h5><pre class="lang-js"><code>var treatmentResults = [
+	{ before: 204, after: 189 },
+	{ before: 212, after: 199 },
+	{ before: 199, after: 191 },
+	{ before: 209, after: 182 },
+	{ before: 191, after: 176 },
+	{ before: 190, after: 180 },
+	{ before: 223, after: 220 },
+	{ before: 185, after: 182 },
+	{ before: 206, after: 194 },
+	{ before: 212, after: 216 }
+];
+
+var testVars = { before: 'metric', after: 'metric'  };
+var stats = new Statistics(treatmentResults, testVars);
+var treatmentSuccess = stats.studentsTTestTwoSamples('before', 'after', { dependent: true }));</code></pre></div><div class="single-entry-returns"><h5>Returns:</h5><pre class="lang-js"><code>{
+	tStatistic: 3.79663&hellip;,
+	degreesOfFreedom: 9,
+	missings: 0,
+	pOneSided: 0.00211&hellip;,
+	pTwoSided: 0.00423&hellip;
+}</code></pre></div></div></div></div></div></div><div class="footer"><div class="footer-inner"><div class="disclaimer"><p>statistics.js is a lightweight library to provide all basic and many advanced utilities commonly used in statistical data analysis. It is free to use, open source and open for contributions. If you find a bug or an error, please help making this tool better and file a report. That said, bugs can happen. For critical projects, use it with caution.</p><p>LaTeX rendering provided by <a href='https://www.mathjax.org' target='_blank' rel='noopener'>MathJax</a>, Syntax highlighting by <a href='http://prismjs.com/' target='_blank' rel='noopener'>Prism.js</a>, Icons by <a href='https://icomoon.io/app' target='_blank' rel='noopener'>Icomoon</a>.</p></div><div class="legal"><a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener">MIT License</a>, 2016 &ndash; 2017</div></div></div></div></body></html>
