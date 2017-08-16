@@ -47,6 +47,11 @@ gulp.task('buildDocsMultiFile', function() {
 		.pipe(gulp.dest(docDst));
 });
 
+gulp.task('buildReadmeMD', function() {
+	buildDocsMF('README.MD', scriptDst, true)
+		.pipe(gulp.dest(scriptDst));
+});
+
 
 
 /***
@@ -64,7 +69,7 @@ gulp.task('test', function() {
 	Build library 
  ***/
 
-gulp.task('build', ['buildDocsMultiFile'], function() {
+gulp.task('build', ['buildDocsMultiFile', 'buildReadmeMD'], function() {
 	return  gulp.src(srcList)
 				.pipe(concat(scriptFile))
 				.pipe(gulp.dest(scriptDst))
@@ -72,4 +77,3 @@ gulp.task('build', ['buildDocsMultiFile'], function() {
 				.pipe(babel({presets: ['babili']}))
 				.pipe(gulp.dest(scriptDst));
 });
-
