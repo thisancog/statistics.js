@@ -1,4 +1,10 @@
 # statistics.js #
+
+
+## Documentation ##
+
+You can find the [full documentation here](https://thisancog.github.io/statistics.js/index.html).
+
 ## About ##
 statistics.js is a lightweight library to provide all basic and many advanced utilities commonly used in statistical data analysis. It is free to use, open source and open for contributions.
 
