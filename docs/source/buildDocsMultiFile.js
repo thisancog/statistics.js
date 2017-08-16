@@ -1,4 +1,4 @@
-var buildDocs = function(filename, dist) {
+var buildDocs = function(filename, dist, readmeMD = false) {
 	var gutil = require('gulp-util'),
 		fs = require('fs'),
 		path = require('path');
@@ -253,15 +253,77 @@ var buildDocs = function(filename, dist) {
 		return host;
 	}
 
+	this.getReadme = function() {
+		if (!this.content) return;
+		var obj = this,
+			markup = '# ' + this.general.title + ' #\n';
+		markup += '\n\n## Documentation ##\n\nYou can find the [full documentation here](' + obj.general.linkToDocs + ').\n\n';
+
+		[].forEach.call(this.content, function(section) {
+			if (section.section !== 'Introduction') return;
+
+			if (section.description)
+				markup += section.description + '\n';
+
+			[].forEach.call(section.items, function(item) {
+				markup += '## ' + item.title + ' ##\n';
+
+				if (item.content)
+					markup += item.content + '\n\n';
+
+				if (item.usage)
+					markup += '**Usage:**\n\n```\n' + item.usage + '\n```\n\n';
+
+				if (item.returns)
+					markup += '**Returns:**\n\n```\n' + item.returns + '\n```\n\n';
+			});
+		});
+
+		// clean up rogue HTML
+		markup = markup.replace(/<h5>([^<]+).*?<\/h5>/gm, '\n\n##### $1 #####\n\n');
+		markup = markup.replace(/<em>([^<]+).*?<\/em>/gm, '*$1*');
+		markup = markup.replace(/<p>([^<]+).*?<\/p>/gm, '$1\n');
+		markup = markup.replace(/(<li>)/gm, '\n\n+ ');
+		markup = markup.replace(/(<\/li>)/gm, '');
+		markup = markup.replace(/(<ul>)|(<\/ul>)|(<ol>)|(<\/ol>)/gm, '\n\n');
+		markup = markup.replace(/<pre.*?><code.*?>([^<]+).*?<\/code><\/pre>/gm, '\n\n```\n$1\n```\n\n');
+		markup = markup.replace(/<code.*?>([^<]+).*?<\/code>/gm, '`$1`');
+		markup = markup.replace(/<a.*?>([^<]+).*?<\/a>/gm, '$1');
+		
+		markup = markup.replace(/<b>([^<]+).*?<\/b>/gm, '**$1**');
+		markup = markup.replace(/&lt;/gm, '<');
+		markup = markup.replace(/&gt;/gm, '>');
+		markup = markup.replace(/(<br>)/gm, '\n');
+		markup = markup.replace(/(&hellip;)/gm, '…');
+		markup = markup.replace(/(&rsquo;)/gm, '’'); 
+
+		return markup;
+	}
+
 	this.concatParts = function(file) {
 		return this.getHeader(file) + this.getSidebar(file) + this.getMain(file) + this.getFooter();
 	}
 
-	this.createFromString = function(destfile, dist) {
+	this.createFromString = function(destfile, dist, readmeMD = false) {
 		var src = require('stream').Readable({ objectMode: true }),
 			sections = this.getSections(),
 			obj = this,
 			result;
+
+		if (readmeMD) {
+			src._read = function () {
+				var content = obj.getReadme();
+
+				this.push(new gutil.File({
+					cwd: "",
+					base: "",
+					path: destfile,
+					contents: new Buffer(content)
+				}));
+				this.push(null);
+			}
+			return src;
+		}
 
 		var files = sections.map(function(item, index) { return item.filename; });
 		files = files.filter(function(item, index) { return files.indexOf(item) === index });
@@ -299,8 +361,7 @@ var buildDocs = function(filename, dist) {
 	}
 
 	this.loadContent();
-	return this.createFromString(filename, dist);
+	return this.createFromString(filename, dist, readmeMD);
 };
 
 module.exports = buildDocs;
-
